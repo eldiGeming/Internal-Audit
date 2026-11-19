@@ -68,22 +68,22 @@
                     @error("items.{$item->id}.evidence") <p class="field-error">{{ $message }}</p> @enderror
                 </div>
 
-                <div @class([
-                    'space-y-2 rounded-lg p-2 ring-1 ring-inset transition-colors',
-                    'bg-emerald-50 ring-emerald-200' => $result === 'sesuai',
-                    'bg-red-50 ring-red-200' => $result === 'tidak_sesuai',
-                    'bg-slate-50 ring-slate-200' => $result === '',
-                ])>
+                {{-- The result itself is the color: a solid green or red control, never a pale box around it. --}}
+                <div class="space-y-2">
                     <label for="r-{{ $item->id }}" class="field-label mb-0 md:sr-only">Hasil pemeriksaan</label>
                     <select id="r-{{ $item->id }}" wire:model.live="items.{{ $item->id }}.result"
-                            @class(['field font-semibold', 'text-emerald-800' => $result === 'sesuai', 'text-red-800' => $result === 'tidak_sesuai'])>
+                            @class([
+                                'field font-semibold [&_option]:bg-white [&_option]:text-slate-900',
+                                'bg-emerald-700 text-white ring-emerald-700 hover:ring-emerald-800' => $result === 'sesuai',
+                                'bg-red-700 text-white ring-red-700 hover:ring-red-800' => $result === 'tidak_sesuai',
+                            ])>
                         <option value="">Pilih hasil</option>
                         <option value="sesuai">Sesuai</option>
                         <option value="tidak_sesuai">Tidak sesuai</option>
                     </select>
                     @if ($result === 'tidak_sesuai')
                         <label for="s-{{ $item->id }}" class="sr-only">Kategori temuan</label>
-                        <select id="s-{{ $item->id }}" wire:model.live="items.{{ $item->id }}.severity" class="field text-red-900">
+                        <select id="s-{{ $item->id }}" wire:model.live="items.{{ $item->id }}.severity" class="field font-semibold text-red-800">
                             <option value="major">1. Major</option>
                             <option value="minor">2. Minor</option>
                             <option value="observasi">3. Observasi</option>

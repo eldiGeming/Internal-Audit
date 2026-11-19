@@ -57,7 +57,7 @@
                     </thead>
                     <tbody>
                         @foreach ($audits as $audit)
-                            <tr wire:key="audit-{{ $audit->id }}" class="transition hover:bg-slate-50/80">
+                            <tr wire:key="audit-{{ $audit->id }}" class="transition hover:bg-slate-50">
                                 <td>
                                     <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="font-bold text-brand-900 hover:underline">{{ $audit->company->name }}</a>
                                     <p class="text-xs text-slate-600">Diubah {{ $audit->updated_at->diffForHumans() }}</p>
@@ -73,7 +73,7 @@
                                 <td class="text-center"><x-compliance :value="$audit->compliance()" :empty="$audit->items_total === 0" /></td>
                                 <td>
                                     <div class="flex justify-end gap-1">
-                                        <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-soft group">
+                                        <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-secondary group">
                                             Buka
                                             <x-icon name="arrow-right" class="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                                         </a>
@@ -108,7 +108,7 @@
                             <div class="rounded-lg bg-slate-50 py-2"><dt class="text-slate-600">CAR</dt><dd @class(['font-bold tabular-nums', 'text-red-700' => $audit->items_findings > 0])>{{ $audit->items_findings }}</dd></div>
                         </dl>
                         <div class="mt-3 flex gap-2">
-                            <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-soft flex-1">Buka audit</a>
+                            <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-secondary flex-1">Buka audit</a>
                             <button type="button" wire:click="deleteAudit({{ $audit->id }})"
                                     wire:confirm="Hapus audit {{ $audit->company->name }} ({{ $audit->displayTitle() }}) beserta seluruh checklist dan CAR-nya?"
                                     class="btn btn-sm btn-icon btn-secondary" aria-label="Hapus audit {{ $audit->company->name }}">

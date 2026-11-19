@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 #[Fillable([
     'checklist_item_id',
@@ -51,6 +52,14 @@ class CorrectiveAction extends Model
             'prevention_due_date' => 'date',
             'status' => CarStatus::class,
         ];
+    }
+
+    /**
+     * The earliest target date set for the correction or the prevention, if any.
+     */
+    public function nextDueDate(): ?Carbon
+    {
+        return collect([$this->correction_due_date, $this->prevention_due_date])->filter()->min();
     }
 
     /**

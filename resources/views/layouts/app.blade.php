@@ -8,12 +8,12 @@
         {{-- Mobile top bar --}}
         <header class="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 bg-brand-900 px-4 text-white lg:hidden">
             <a href="{{ route('home') }}" wire:navigate class="flex min-h-11 items-center gap-2.5">
-                <span class="grid size-8 place-items-center rounded-lg bg-white/10 ring-1 ring-white/20">
-                    <x-icon name="shield-check" class="size-5" />
+                <span class="grid size-8 place-items-center rounded-lg bg-white text-brand-900">
+                    <x-icon name="shield-check-fill" class="size-5" />
                 </span>
                 <span class="text-sm font-extrabold tracking-wide">AUDIT INTERNAL</span>
             </a>
-            <button type="button" x-on:click="navOpen = true" class="btn btn-icon text-white hover:bg-white/10" aria-label="Buka menu navigasi">
+            <button type="button" x-on:click="navOpen = true" class="btn btn-icon text-white hover:bg-brand-800" aria-label="Buka menu navigasi">
                 <x-icon name="list" class="size-6" />
             </button>
         </header>

@@ -3,7 +3,7 @@
     <span class="pill ok">SESUAI</span>
 @elseif ($item->result === \App\Enums\CheckResult::TidakSesuai)
     @php $severity = $item->findingSeverity(); @endphp
-    <span class="pill {{ ['major' => 'major', 'minor' => 'minor', 'observasi' => 'obs'][$severity->value] }} {{ ['major' => 'major', 'minor' => 'minor', 'observasi' => 'obs'][$severity->value] }}">TIDAK SESUAI ({{ strtoupper($severity->label()) }})</span>
+    <span class="pill {{ ['major' => 'major', 'minor' => 'minor', 'observasi' => 'obs'][$severity->value] }}">TIDAK SESUAI ({{ strtoupper($severity->label()) }})</span>
 @else
     <span class="muted">Belum diperiksa</span>
 @endif

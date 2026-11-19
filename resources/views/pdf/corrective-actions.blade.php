@@ -25,7 +25,7 @@
                 <td style="width: 28%;"><span class="label">Departemen</span><b class="navy">{{ $department->displayName() }}</b></td>
                 <td style="width: 24%;"><span class="label">Auditee</span><b>{{ $department->auditee ?: '-' }}</b></td>
                 <td style="width: 24%;"><span class="label">Auditor</span><b>{{ $department->auditor ?: '-' }}</b></td>
-                <td><span class="label">Kategori temuan</span><span class="pill {{ $severityClass }} {{ $severityClass }}">TIDAK SESUAI ({{ strtoupper($finding['severity']->label()) }})</span></td>
+                <td><span class="label">Kategori temuan</span><span class="pill {{ $severityClass }}">TIDAK SESUAI ({{ strtoupper($finding['severity']->label()) }})</span></td>
             </tr>
         </table>
 
@@ -44,7 +44,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title blue">C. Tindakan koreksi (perbaikan langsung atas temuan)</div>
+            <div class="section-title">C. Tindakan koreksi (perbaikan langsung atas temuan)</div>
             <div class="section-body">
                 <div class="pre" style="min-height: 30px;">{{ $action?->correction ?: '-' }}</div>
                 <table style="width: 100%; margin-top: 5px; border-top: 1px solid #e2e8f0;"><tr>
@@ -55,7 +55,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title green">D. Tindakan pencegahan (mencegah terulangnya ketidaksesuaian)</div>
+            <div class="section-title">D. Tindakan pencegahan (mencegah terulangnya ketidaksesuaian)</div>
             <div class="section-body">
                 <div class="pre" style="min-height: 30px;">{{ $action?->prevention ?: '-' }}</div>
                 <table style="width: 100%; margin-top: 5px; border-top: 1px solid #e2e8f0;"><tr>
@@ -69,7 +69,7 @@
             <div class="section-title">E. Verifikasi efektivitas &amp; status CAR (diisi auditor)</div>
             <div class="section-body">
                 <div>{{ $action?->verification_note ?: 'Menunggu verifikasi tindak lanjut.' }}</div>
-                <div style="margin-top: 4px;"><b>Status CAR:</b> <span class="pill">{{ ($action?->status ?? \App\Enums\CarStatus::Open)->label() }}</span></div>
+                <div style="margin-top: 4px;"><b>Status CAR:</b> <span class="pill {{ ($action?->status ?? \App\Enums\CarStatus::Open)->value }}">{{ ($action?->status ?? \App\Enums\CarStatus::Open)->label() }}</span></div>
             </div>
         </div>
 

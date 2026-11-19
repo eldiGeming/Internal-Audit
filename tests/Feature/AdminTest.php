@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CarStatus;
 use App\Enums\CheckResult;
 use App\Enums\UserRole;
 use App\Livewire\Admin\AuditorManager;
 use App\Livewire\Admin\CorrectiveActionRegister;
+use App\Livewire\Admin\Dashboard;
 use App\Models\Audit;
 use App\Models\AuditDepartment;
 use App\Models\ChecklistItem;
@@ -13,6 +15,7 @@ use App\Models\Company;
 use App\Models\CorrectiveAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
@@ -48,6 +51,29 @@ class AdminTest extends TestCase
             ->assertSeeInOrder(['Peringkat kepatuhan PT', 'PT Patuh Selalu', 'PT Masih Belajar']);
     }
 
+    #[Test]
+    public function the_dashboard_tracks_car_follow_up_against_target_dates(): void
+    {
+        $this->travelTo('2026-11-20 09:00');
+        $department = AuditDepartment::factory()->for(Audit::factory())->create();
+        $finding = fn () => ChecklistItem::factory()->finding()->for($department, 'department')->create();
+
+        $overdue = CorrectiveAction::factory()->for($finding(), 'item')->create(['correction_due_date' => '2026-11-18', 'prevention_due_date' => '2026-12-30']);
+        $dueToday = CorrectiveAction::factory()->for($finding(), 'item')->create(['correction_due_date' => '2026-11-20', 'prevention_due_date' => null]);
+        CorrectiveAction::factory()->for($finding(), 'item')->create(['correction_due_date' => '2026-11-01', 'status' => CarStatus::Closed]);
+        $finding(); // no CAR sheet filled in yet
+
+        Livewire::actingAs($this->admin)
+            ->test(Dashboard::class)
+            ->assertViewHas('findingsCount', 4)
+            ->assertViewHas('openCount', 3)
+            ->assertViewHas('overdueCount', 1)
+            ->assertViewHas('closedCount', 1)
+            ->assertViewHas('progress', fn (Collection $progress): bool => $progress->mapWithKeys(fn (array $row): array => [$row['state']->value => $row['count']])->all()
+                === ['overdue' => 1, 'not_planned' => 1, 'in_progress' => 1, 'closed' => 1])
+            ->assertViewHas('followUps', fn (Collection $followUps): bool => $followUps->pluck('action.id')->all() === [$overdue->id, $dueToday->id]);
+    }
+
     private function auditWithResults(Company $company, int $sesuai, int $findings, string $date): Audit
     {
         $audit = Audit::factory()->for($company)->create(['audit_date' => $date]);
@@ -73,6 +99,90 @@ class AdminTest extends TestCase
         $auditor = User::query()->where('username', 'andi')->sole();
         $this->assertSame(UserRole::Auditor, $auditor->role);
         $this->assertTrue(Hash::check('rahasia-123', $auditor->password));
+    }
+
+    #[Test]
+    public function after_setting_a_password_the_login_info_is_offered_once_for_copying(): void
+    {
+        $manager = Livewire::actingAs($this->admin)
+            ->test(AuditorManager::class)
+            ->call('create')
+            ->set('name', 'Andi Pratama')
+            ->set('username', 'andi')
+            ->set('password', 'rahasia-123')
+            ->call('save')
+            ->assertSet('showShare', true)
+            ->assertSet('password', '')
+            ->assertSet('shareText', fn (string $text): bool => str_contains($text, 'Username: andi')
+                && str_contains($text, 'Password: rahasia-123')
+                && str_contains($text, 'Link login: '.route('login')));
+
+        $manager->set('showShare', false)->assertSet('shareText', '');
+    }
+
+    #[Test]
+    public function saving_without_a_new_password_does_not_offer_login_info(): void
+    {
+        $auditor = User::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(AuditorManager::class)
+            ->call('edit', $auditor->id)
+            ->set('team', 'Tim Audit Mutu')
+            ->call('save')
+            ->assertSet('showShare', false)
+            ->assertSet('shareText', '');
+    }
+
+    #[Test]
+    public function the_issued_password_is_stored_encrypted_and_copied_on_request_only(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(AuditorManager::class)
+            ->call('create')
+            ->set('name', 'Rina Marlina')
+            ->set('username', 'rina_qc')
+            ->set('password', 'Rahasia-777')
+            ->call('save');
+
+        $auditor = User::query()->where('username', 'rina_qc')->sole();
+        $this->assertSame('Rahasia-777', $auditor->issued_password);
+        $this->assertNotSame('Rahasia-777', $auditor->getRawOriginal('issued_password'));
+
+        $this->actingAs($this->admin)
+            ->get(route('admin.auditors'))
+            ->assertOk()
+            ->assertSee('Salin akun')
+            ->assertDontSee('Rahasia-777');
+
+        Livewire::actingAs($this->admin)
+            ->test(AuditorManager::class)
+            ->call('loginInfoFor', $auditor->id)
+            ->assertReturned(fn (string $text): bool => str_contains($text, 'Username: rina_qc')
+                && str_contains($text, 'Password: Rahasia-777')
+                && str_contains($text, 'Link login: '.route('login')));
+    }
+
+    #[Test]
+    public function an_account_without_an_issued_password_copies_without_one(): void
+    {
+        $auditor = User::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(AuditorManager::class)
+            ->call('loginInfoFor', $auditor->id)
+            ->assertReturned(fn (string $text): bool => str_contains($text, 'Password: hubungi admin'));
+    }
+
+    #[Test]
+    public function only_admins_can_fetch_login_info(): void
+    {
+        $auditor = User::factory()->create(['issued_password' => 'Rahasia-777']);
+
+        Livewire::actingAs(User::factory()->create())
+            ->test(AuditorManager::class)
+            ->call('loginInfoFor', $auditor->id)
+            ->assertForbidden();
     }
 
     #[Test]

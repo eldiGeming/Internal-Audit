@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Ziban Robani',
             'email' => 'auditor@auditinternal.co.id',
             'password' => 'auditor123',
+            'issued_password' => 'auditor123',
             'role' => UserRole::Auditor,
             'team' => 'Tim Auditor Internal',
             'is_active' => true,

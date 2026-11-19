@@ -18,7 +18,7 @@
                 @endisset
             </dt>
             <dd @class([
-                'mt-1 text-3xl leading-none font-extrabold tabular-nums',
+                'mt-1 text-3xl leading-none font-extrabold',
                 'text-slate-500' => $isZero,
                 $stat['tone'] ?? 'text-brand-900' => ! $isZero,
             ])>{{ $stat['value'] }}</dd>

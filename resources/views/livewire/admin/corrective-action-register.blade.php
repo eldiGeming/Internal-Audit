@@ -47,7 +47,7 @@
                                         <p class="mt-1 line-clamp-2 text-sm text-slate-700">{{ $finding['item']->question }}</p>
                                     </div>
                                     <div class="flex shrink-0 gap-2">
-                                        <button type="button" wire:click="view({{ $finding['item']->id }})" class="btn btn-sm btn-soft"><x-icon name="eye" class="size-4" />Detail</button>
+                                        <button type="button" wire:click="view({{ $finding['item']->id }})" class="btn btn-sm btn-secondary"><x-icon name="eye" class="size-4" />Detail</button>
                                         <button type="button" wire:click="deleteCorrectiveAction({{ $finding['item']->id }})"
                                                 wire:confirm="Hapus {{ $finding['number'] }} ({{ $company->name }})? Dokumen CAR dihapus dan item pemeriksaannya ditandai Sesuai."
                                                 class="btn btn-sm btn-secondary hover:text-red-700"><x-icon name="trash" class="size-4" />Hapus</button>

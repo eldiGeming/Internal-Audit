@@ -11,7 +11,8 @@
  * Shape rule: controls (buttons, inputs, switch) 8px radius or less, surfaces (cards, sheets, modals) 12px.
  * No pills: statuses and counts are text (with an icon, severity bars, or a compliance meter), never tinted capsules.
  * Semantic result colors: emerald = Sesuai, red = Major, orange = Minor, amber = Observasi. No other accents.
- * Buttons: navy = next step / export / save, emerald (.btn-add*) = add new data.
+ * Buttons: navy = next step / export / save, emerald (.btn-add) = add new data.
+ * No gradients and no pastel "tint + same-hue ring" surfaces: color is either a solid fill or plain text.
  */
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
@@ -79,29 +80,20 @@
         @apply min-h-9 min-w-9 px-0;
     }
 
+    /*
+     * Every button is one flat color: no pastel fills, no tinted rings, no shadows.
+     * navy = next step / export / save, emerald = add data, white = neutral, red = delete.
+     */
     .btn-primary {
-        @apply bg-brand-900 text-white shadow-[0_1px_2px_rgb(15_41_74/0.25)] hover:bg-brand-800;
+        @apply bg-brand-900 text-white hover:bg-brand-800;
     }
 
     .btn-secondary {
-        @apply bg-white text-slate-700 ring-1 ring-slate-300 ring-inset hover:bg-slate-50 hover:text-slate-900;
+        @apply bg-white text-slate-800 ring-1 ring-slate-300 ring-inset hover:bg-slate-100 hover:text-slate-900;
     }
 
-    .btn-soft {
-        @apply bg-brand-50 text-brand-800 ring-1 ring-brand-200 ring-inset hover:bg-brand-100;
-    }
-
-    /* Add / create data. Green so it never reads like the navy "next step" or export actions. */
     .btn-add {
-        @apply bg-emerald-700 text-white shadow-[0_1px_2px_rgb(4_120_87/0.3)] hover:bg-emerald-800;
-    }
-
-    .btn-add-soft {
-        @apply bg-emerald-50 text-emerald-800 ring-1 ring-emerald-300 ring-inset hover:bg-emerald-100;
-    }
-
-    .btn-add-ghost {
-        @apply text-emerald-800 hover:bg-emerald-50;
+        @apply bg-emerald-700 text-white hover:bg-emerald-800;
     }
 
     .btn-ghost {
@@ -113,7 +105,7 @@
     }
 
     .btn-danger-ghost {
-        @apply text-slate-500 hover:bg-red-50 hover:text-red-700;
+        @apply text-slate-500 hover:bg-red-700 hover:text-white;
     }
 
     /* Form fields */

@@ -58,7 +58,7 @@
             <div class="mt-6">
                 @include('livewire.audits.partials.items-table', ['withCriteria' => true])
                 @if ($department->items->isNotEmpty())
-                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-add-ghost mt-2">
+                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-add mt-2">
                         <x-icon name="plus" class="size-4" />
                         Tambah baris
                     </button>

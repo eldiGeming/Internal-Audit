@@ -14,7 +14,10 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 /**
- * Admin CRUD for auditor accounts. Passwords are never shown; leave the field empty to keep the current one.
+ * Admin CRUD for auditor accounts. Login checks the hashed password; the password the admin issues is also
+ * kept encrypted (issued_password) so "Salin akun" can copy the full login details, password included, at
+ * any time. It is never rendered into the page: it is fetched only when the copy button is clicked.
+ * Leave the password field empty when editing to keep the current one.
  */
 #[Title('Akun Auditor')]
 class AuditorManager extends Component
@@ -39,6 +42,11 @@ class AuditorManager extends Component
     public string $password = '';
 
     public bool $isActive = true;
+
+    /** The one-time "account ready to share" dialog, shown after a password was set. */
+    public bool $showShare = false;
+
+    public string $shareText = '';
 
     public function updatedSearch(): void
     {
@@ -96,18 +104,71 @@ class AuditorManager extends Component
 
         if (filled($validated['password'])) {
             $attributes['password'] = $validated['password'];
+            $attributes['issued_password'] = $validated['password'];
         }
 
         if ($this->editingId) {
-            $this->auditor($this->editingId)->update($attributes);
+            $user = $this->auditor($this->editingId);
+            $user->update($attributes);
             $message = "Akun {$attributes['name']} diperbarui.";
         } else {
-            User::query()->create($attributes);
+            $user = User::query()->create($attributes);
             $message = "Akun auditor {$attributes['name']} dibuat.";
         }
 
         $this->showForm = false;
+        $this->reset('password');
         $this->dispatch('toast', message: $message, type: 'success');
+
+        if (filled($validated['password'])) {
+            $this->shareText = self::loginInfo($user, $validated['password']);
+            $this->showShare = true;
+        }
+    }
+
+    /**
+     * Full login details for one auditor, password included when the admin issued it through this screen.
+     * Called from the copy button, so the password never sits in the page HTML.
+     */
+    public function loginInfoFor(int $userId): string
+    {
+        $user = $this->auditor($userId);
+
+        return self::loginInfo($user, $user->issued_password);
+    }
+
+    public function closeShare(): void
+    {
+        $this->showShare = false;
+        $this->shareText = '';
+    }
+
+    /**
+     * Closing the share dialog (button, X or Escape) forgets the password, so it only exists for that one view.
+     */
+    public function updatedShowShare(bool $isOpen): void
+    {
+        if (! $isOpen) {
+            $this->shareText = '';
+        }
+    }
+
+    /**
+     * Plain-text login details to paste into a chat or email. Accounts whose password was set before
+     * issued passwords were kept have none to copy; the text then sends the auditor to the admin.
+     */
+    private static function loginInfo(User $user, ?string $password = null): string
+    {
+        return implode(PHP_EOL, array_filter([
+            'Akun '.config('app.name'),
+            'Nama: '.$user->name,
+            'Username: '.$user->username,
+            $user->email ? 'Email: '.$user->email : null,
+            'Password: '.($password ?? 'hubungi admin'),
+            'Link login: '.route('login'),
+            '',
+            'Masuk memakai username atau email di atas.',
+        ], fn (?string $line): bool => $line !== null));
     }
 
     public function toggleActive(int $userId): void

@@ -11,7 +11,7 @@
         @isset($carNumber)
             <td style="width: 100px; text-align: right; padding-right: 8px;">
                 <div class="kicker" style="color: #64748b;">Nomor CAR</div>
-                <div style="font-size: 12pt; font-weight: bold; color: #b91c1c; border: 1px solid #fecaca; background: #fef2f2; padding: 3px 6px; display: inline-block;">{{ $carNumber }}</div>
+                <div style="font-size: 12pt; font-weight: bold; color: #fff; background: #0f294a; padding: 3px 7px; display: inline-block;">{{ $carNumber }}</div>
             </td>
         @endisset
         <td style="width: 112px;">

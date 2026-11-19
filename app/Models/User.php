@@ -13,8 +13,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
-#[Fillable(['name', 'username', 'email', 'password', 'role', 'team', 'is_active'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'username', 'email', 'password', 'issued_password', 'role', 'team', 'is_active'])]
+#[Hidden(['password', 'issued_password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -30,6 +30,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            // Admin-issued password kept recoverable (encrypted with APP_KEY) so login details can be copied again.
+            'issued_password' => 'encrypted',
             'role' => UserRole::class,
             'is_active' => 'boolean',
         ];

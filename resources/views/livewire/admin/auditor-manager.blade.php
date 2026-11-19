@@ -67,7 +67,13 @@
                                 </td>
                                 <td>
                                     <div class="flex justify-end gap-1">
-                                        <button type="button" wire:click="edit({{ $auditor->id }})" class="btn btn-sm btn-soft"><x-icon name="pencil-simple" class="size-4" />Edit</button>
+                                        <button type="button" wire:click="edit({{ $auditor->id }})" class="btn btn-sm btn-secondary"><x-icon name="pencil-simple" class="size-4" />Edit</button>
+                                        {{-- The password is fetched on click ($wire.loginInfoFor), never printed into this page. --}}
+                                        @php $hasIssuedPassword = $auditor->getRawOriginal('issued_password') !== null; @endphp
+                                        <x-copy-button :fetch="'$wire.loginInfoFor('.$auditor->id.')'" label="Salin akun" class="btn-sm btn-secondary"
+                                                       :copied-message="$hasIssuedPassword
+                                                           ? 'Akun dan password '.$auditor->name.' disalin.'
+                                                           : 'Akun '.$auditor->name.' disalin tanpa password. Atur password lewat Edit agar ikut tersalin.'" />
                                         <button type="button" wire:click="delete({{ $auditor->id }})"
                                                 wire:confirm="Hapus akun {{ $auditor->name }}? {{ $auditor->audits_count }} audit miliknya tetap tersimpan tanpa pemilik dan hanya bisa dibuka admin."
                                                 class="btn btn-sm btn-icon btn-danger-ghost" aria-label="Hapus akun {{ $auditor->name }}">
@@ -132,6 +138,18 @@
                 <x-icon name="floppy-disk" class="size-4" />
                 Simpan akun
             </button>
+        </x-slot:footer>
+    </x-modal>
+
+    {{-- Shown once after a password was set: the only moment the password can still be copied. --}}
+    <x-modal show="showShare" title="Akun siap dibagikan" icon="user-circle">
+        <p class="text-sm text-slate-700">Salin lalu kirim ke auditor lewat chat atau email. Password hanya tampil sekali ini; setelah dialog ditutup, password tidak bisa dilihat lagi.</p>
+        <pre class="mt-4 overflow-x-auto rounded-lg bg-slate-50 p-4 text-sm leading-relaxed whitespace-pre-wrap text-slate-900 ring-1 ring-slate-200 ring-inset">{{ $shareText }}</pre>
+        <x-slot:footer>
+            <button type="button" wire:click="closeShare" class="btn btn-secondary">Selesai</button>
+            @if ($shareText !== '')
+                <x-copy-button :text="$shareText" label="Salin akun dan password" class="btn-primary" copied-message="Akun dan password disalin." />
+            @endif
         </x-slot:footer>
     </x-modal>
 </div>

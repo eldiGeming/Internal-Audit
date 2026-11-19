@@ -42,7 +42,20 @@ enum FindingSeverity: string
     }
 
     /**
-     * Parse loose spreadsheet/JSON input such as "1. Major" or "observasi".
+     * Solid bar fill for charts: an ordinal ramp, darkest for the most severe, every step at least 3:1
+     * against white (checked with the dataviz palette validator: amber-600, orange-700, red-800).
+     */
+    public function barClass(): string
+    {
+        return match ($this) {
+            self::Major => 'bg-red-800',
+            self::Minor => 'bg-orange-700',
+            self::Observasi => 'bg-amber-600',
+        };
+    }
+
+    /**
+     * Parse loose spreadsheet input such as "1. Major" or "observasi".
      */
     public static function fromLoose(?string $value): ?self
     {

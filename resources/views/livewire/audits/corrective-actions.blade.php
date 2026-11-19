@@ -5,6 +5,8 @@
         </x-slot:actions>
     </x-audit.header>
 
+    {{-- carSpy (resources/js/car-spy.js) marks the CAR picked from the list or being read while scrolling. --}}
+    <div x-data="carSpy">
     <section class="card p-5 sm:p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -25,8 +27,10 @@
         @if ($findings->isNotEmpty())
             <div class="mt-5 grid gap-3 border-t border-slate-100 pt-5 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach ($findings as $finding)
-                    <a href="#{{ Str::lower($finding['number']) }}" wire:key="chip-{{ $finding['item']->id }}"
-                       class="group rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200 transition ring-inset hover:-translate-y-0.5 hover:bg-white hover:shadow-md hover:ring-brand-300">
+                    @php $sheetId = Str::lower($finding['number']); @endphp
+                    <a href="#{{ $sheetId }}" wire:key="chip-{{ $finding['item']->id }}" x-on:click.prevent="go('{{ $sheetId }}')"
+                       class="group rounded-xl p-4 ring-inset transition hover:-translate-y-0.5"
+                       x-bind:class="isActive('{{ $sheetId }}') ? 'bg-white ring-[3px] ring-brand-900' : 'bg-slate-50 ring-1 ring-slate-200 hover:bg-white hover:ring-2 hover:ring-brand-900'">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-sm font-extrabold tracking-wide text-brand-900 tabular-nums group-hover:underline group-hover:underline-offset-4">{{ $finding['number'] }}</span>
                             <x-severity :severity="$finding['severity']" />
@@ -48,6 +52,24 @@
         </x-empty-state>
     @endif
 
+    @if ($findings->count() > 1)
+        {{-- Stays on screen while scrolling through long CAR sheets; the CAR being read is filled navy. --}}
+        <nav class="sticky top-14 z-20 -mx-4 mt-5 border-b border-slate-300 bg-canvas px-4 py-2.5 sm:-mx-6 sm:px-6 lg:top-0 lg:-mx-8 lg:px-8" aria-label="Lompat ke CAR">
+            <div class="flex items-center gap-2 overflow-x-auto [scrollbar-width:thin]">
+                <span class="shrink-0 text-xs font-semibold text-slate-600">Lompat ke</span>
+                @foreach ($findings as $finding)
+                    @php $sheetId = Str::lower($finding['number']); @endphp
+                    <button type="button" wire:key="jump-{{ $finding['item']->id }}" x-on:click="go('{{ $sheetId }}')"
+                            x-bind:aria-current="isActive('{{ $sheetId }}') ? 'true' : 'false'"
+                            class="btn btn-sm shrink-0 tabular-nums"
+                            x-bind:class="isActive('{{ $sheetId }}') ? 'bg-brand-900 text-white hover:bg-brand-800' : 'bg-white text-brand-900 ring-1 ring-slate-300 ring-inset hover:bg-slate-100'">
+                        {{ $finding['number'] }}
+                    </button>
+                @endforeach
+            </div>
+        </nav>
+    @endif
+
     <div class="mt-5 space-y-6">
         @foreach ($findings as $finding)
             @php
@@ -56,7 +78,11 @@
                 $key = "cars.{$item->id}";
             @endphp
             @continue(! isset($cars[$item->id]))
-            <article id="{{ Str::lower($finding['number']) }}" wire:key="car-{{ $item->id }}" class="sheet scroll-mt-6 p-5 sm:p-8">
+            @php $sheetId = Str::lower($finding['number']); @endphp
+            {{-- Hover: 2px navy frame. Active (picked or being read): 3px navy frame. --}}
+            <article id="{{ $sheetId }}" data-car-sheet wire:key="car-{{ $item->id }}"
+                     class="sheet scroll-mt-32 p-5 transition-[box-shadow,border-color] duration-200 hover:border-brand-900 hover:ring-1 hover:ring-brand-900 sm:p-8 lg:scroll-mt-20"
+                     x-bind:class="isActive('{{ $sheetId }}') && 'border-brand-900 ring-2 hover:ring-2 ring-brand-900'">
                 {{-- Viewer bar above the paper: actions for this one CAR, kept apart from the document content. --}}
                 <div class="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-xl border-b border-slate-200 bg-slate-50 px-5 py-2.5 sm:-mx-8 sm:-mt-8 sm:mb-8 sm:px-8">
                     <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -165,6 +191,8 @@
                 </div>
             </article>
         @endforeach
+    </div>
+
     </div>
 
     <x-audit.step-nav :audit="$audit" current="car" />

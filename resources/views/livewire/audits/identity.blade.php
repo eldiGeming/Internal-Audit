@@ -63,7 +63,7 @@
             </div>
             <p class="mt-1 text-sm text-slate-600">Tampil di kop Daftar Periksa, CAR, Rekap, dan Kesimpulan.</p>
 
-            <label class="group relative mt-4 flex min-h-48 flex-1 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/60 p-5 text-center transition hover:border-brand-500 hover:bg-brand-50/50">
+            <label class="group relative mt-4 flex min-h-48 flex-1 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white p-5 text-center transition hover:border-brand-700 hover:bg-slate-50">
                 <input type="file" wire:model="logo" accept="image/png,image/jpeg,image/webp" class="absolute inset-0 cursor-pointer opacity-0" aria-describedby="logo-help">
 
                 <div wire:loading.flex wire:target="logo" class="flex-col items-center gap-2 text-sm font-medium text-brand-700">

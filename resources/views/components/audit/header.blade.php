@@ -51,7 +51,7 @@
                        @if ($count !== null) title="{{ $count }} {{ $step['unit'] }}" @endif
                        @class([
                            'group relative flex min-h-12 items-center justify-center gap-2 px-4 text-sm whitespace-nowrap transition-colors',
-                           'bg-brand-50/70 font-bold text-brand-900' => $isCurrent,
+                           'font-bold text-brand-900' => $isCurrent,
                            'font-semibold text-slate-600 hover:bg-slate-50 hover:text-brand-900' => ! $isCurrent,
                        ])>
                         <span @class([

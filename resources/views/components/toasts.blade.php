@@ -24,7 +24,7 @@
             x-transition:enter-end="translate-y-0 opacity-100"
             x-transition:leave="transition duration-200"
             x-transition:leave-end="opacity-0"
-            class="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl bg-brand-950 px-4 py-3 text-sm text-white shadow-lg shadow-brand-950/20 ring-1 ring-white/10"
+            class="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl bg-brand-950 px-4 py-3 text-sm text-white shadow-lg shadow-brand-950/20"
             role="status"
         >
             <span class="mt-0.5" :class="{ 'text-emerald-400': toast.type === 'success', 'text-red-400': toast.type === 'error', 'text-brand-300': toast.type === 'info' }">
@@ -32,7 +32,7 @@
                 <template x-if="toast.type !== 'error'"><x-icon name="check-circle" class="size-5" /></template>
             </span>
             <p class="flex-1 font-medium" x-text="toast.message"></p>
-            <button type="button" x-on:click="remove(toast.id)" class="-m-1 rounded p-1 text-white/60 hover:text-white" aria-label="Tutup notifikasi">
+            <button type="button" x-on:click="remove(toast.id)" class="-m-1 rounded p-1 text-brand-300 hover:text-white" aria-label="Tutup notifikasi">
                 <x-icon name="x" class="size-4" />
             </button>
         </div>

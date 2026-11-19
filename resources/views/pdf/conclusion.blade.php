@@ -15,7 +15,7 @@
     <div class="heading"><span class="num">I</span> Rekapitulasi hasil audit seluruh departemen <span class="muted" style="text-transform: none; font-weight: normal;">(kepatuhan keseluruhan {{ $totals['compliance'] }}%)</span></div>
     @include('pdf.partials.recap-table', ['noteHeading' => 'Catatan departemen'])
 
-    <div class="heading"><span class="num" style="background: #b91c1c;">II</span> Daftar CAR &amp; rencana tindakan ({{ $findings->count() }})</div>
+    <div class="heading"><span class="num">II</span> Daftar CAR &amp; rencana tindakan ({{ $findings->count() }})</div>
     @forelse ($findings as $finding)
         @php
             $item = $finding['item'];
@@ -25,8 +25,8 @@
         <div class="section">
             <div class="section-title">
                 {{ $finding['number'] }}, {{ $finding['department']->displayName() }}
-                <span class="pill {{ $severityClass }} {{ $severityClass }}" style="margin-left: 4px;">{{ strtoupper($finding['severity']->label()) }}</span>
-                <span class="pill" style="margin-left: 2px;">{{ ($action?->status ?? \App\Enums\CarStatus::Open)->label() }}</span>
+                <span class="pill {{ $severityClass }}" style="margin-left: 4px;">{{ strtoupper($finding['severity']->label()) }}</span>
+                <span class="pill {{ ($action?->status ?? \App\Enums\CarStatus::Open)->value }}" style="margin-left: 2px;">{{ ($action?->status ?? \App\Enums\CarStatus::Open)->label() }}</span>
             </div>
             <div class="section-body">
                 <div><b>Poin pemeriksaan:</b> {{ $item->question }}</div>
@@ -43,7 +43,7 @@
         <p class="muted">Tidak ada temuan CAR pada audit ini.</p>
     @endforelse
 
-    <div class="heading"><span class="num" style="background: #047857;">III</span> Pernyataan kesimpulan akhir &amp; rekomendasi tim auditor</div>
+    <div class="heading"><span class="num">III</span> Pernyataan kesimpulan akhir &amp; rekomendasi tim auditor</div>
     <div class="section"><div class="section-body pre" style="min-height: 50px;">{{ $audit->final_conclusion ?: '-' }}</div></div>
 
     <table class="signatures">

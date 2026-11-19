@@ -3,7 +3,7 @@
     <p class="mt-1 text-sm text-slate-600">Gunakan akun yang diberikan administrator untuk membuka dashboard audit.</p>
 
     @if (session('status'))
-        <div class="mt-5 flex items-start gap-2.5 rounded-lg bg-amber-50 p-3 text-sm font-medium text-amber-900 ring-1 ring-amber-200 ring-inset" role="alert">
+        <div class="mt-5 flex items-start gap-2.5 rounded-lg bg-amber-700 p-3 text-sm font-medium text-white" role="alert">
             <x-icon name="warning" class="mt-0.5 size-4" />
             <span>{{ session('status') }}</span>
         </div>
@@ -75,9 +75,7 @@
     <div x-cloak x-show="forgotOpen" x-transition.opacity class="fixed inset-0 z-[60] grid place-items-center bg-brand-950/50 p-4" x-on:keydown.escape.window="forgotOpen = false">
         <div x-on:click.outside="forgotOpen = false" class="card w-full max-w-md p-6" role="dialog" aria-modal="true" aria-labelledby="forgot-title">
             <div class="flex items-start gap-3">
-                <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-700">
-                    <x-icon name="key" class="size-5" />
-                </span>
+                <x-icon name="key" class="mt-0.5 size-6 shrink-0 text-brand-700" />
                 <div>
                     <h3 id="forgot-title" class="text-base font-bold text-brand-900">Reset password</h3>
                     <p class="mt-1 text-sm leading-relaxed text-slate-600">

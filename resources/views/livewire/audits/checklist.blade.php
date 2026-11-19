@@ -60,7 +60,7 @@
                             @endforeach
                         </ol>
                         @error('criteria.*') <p class="field-error">{{ $message }}</p> @enderror
-                        <button type="button" wire:click="addCriterion" class="btn btn-sm btn-add-soft mt-3">
+                        <button type="button" wire:click="addCriterion" class="btn btn-sm btn-add mt-3">
                             <x-icon name="plus" class="size-4" />
                             Tambah criteria
                         </button>
@@ -81,7 +81,7 @@
                     </a>
                 </div>
 
-                <label class="group relative mt-4 flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brand-200 bg-brand-50/40 p-4 text-center transition hover:border-brand-500 hover:bg-brand-50">
+                <label class="group relative mt-4 flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white p-4 text-center transition hover:border-brand-700 hover:bg-slate-50">
                     <input type="file" wire:model="importFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="absolute inset-0 cursor-pointer opacity-0" aria-describedby="import-help">
                     <span wire:loading.flex wire:target="importFile" class="flex-col items-center gap-2 text-sm font-medium text-brand-700">
                         <x-icon name="arrows-clockwise" class="size-6 animate-spin" />
@@ -117,7 +117,7 @@
                 </div>
                 <div class="flex shrink-0 flex-wrap gap-2">
                     <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-add"><x-icon name="plus" class="size-4" />Tambah item</button>
-                    <button type="button" wire:click="addItems(5)" class="btn btn-sm btn-add-soft">+5 item</button>
+                    <button type="button" wire:click="addItems(5)" class="btn btn-sm btn-add">+5 item</button>
                     <button type="button" wire:click="clearEmptyItems" class="btn btn-sm btn-secondary"><x-icon name="broom" class="size-4" />Rapikan kosong</button>
                 </div>
             </div>

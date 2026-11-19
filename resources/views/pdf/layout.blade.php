@@ -33,16 +33,15 @@
         .minor { color: #c2410c; }
         .obs { color: #b45309; }
         .muted { color: #64748b; }
-        /* Square marker with a severity bar on the left, same language as the screen (no rounded pills). */
-        .pill { display: inline-block; padding: 1px 5px; border: 1px solid #cbd5e1; border-left: 3px solid #64748b; border-radius: 1px; font-size: 7pt; font-weight: bold; }
-        .pill.major { border-left-color: #b91c1c; }
-        .pill.minor { border-left-color: #c2410c; }
-        .pill.obs { border-left-color: #b45309; }
-        .pill.ok { border-left-color: #047857; }
+        /* Square marker in one solid color with white text: no rounded pills, no pale tints, no gradients. */
+        .pill { display: inline-block; padding: 1px 5px; background: #475569; color: #fff; font-size: 7pt; font-weight: bold; }
+        .pill.major { background: #b91c1c; color: #fff; }
+        .pill.minor { background: #c2410c; color: #fff; }
+        .pill.obs { background: #b45309; color: #fff; }
+        .pill.ok, .pill.closed { background: #047857; color: #fff; }
+        .pill.open { background: #b45309; color: #fff; }
         .section { border: 1px solid #94a3b8; margin-bottom: 7px; page-break-inside: avoid; }
         .section-title { background: #eef2f7; border-bottom: 1px solid #94a3b8; padding: 4px 7px; font-size: 7.4pt; font-weight: bold; color: #0f294a; text-transform: uppercase; }
-        .section-title.blue { background: #e7eef8; }
-        .section-title.green { background: #e8f6ef; }
         .section-body { padding: 6px 7px; }
         .pre { white-space: pre-line; }
         .heading { font-size: 9.5pt; font-weight: bold; color: #0f294a; text-transform: uppercase; margin: 12px 0 5px; }
