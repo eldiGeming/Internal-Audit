@@ -1,58 +1,146 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Audit Internal
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk mengelola audit internal: identitas audit, checklist per departemen, daftar periksa, CAR (Corrective Action Request), rekap kepatuhan, dan kesimpulan audit, lengkap dengan export PDF dan dashboard admin.
 
-## About Laravel
+Acuan: prototype `Requirement_Auditor/Internal_audit.txt` (sama dengan [halaman referensi](https://sites.google.com/view/audit-internal-inheren/full-page-embed)) dan daftar perubahan klien `Requirement_Auditor/Menu.docx`. Bila keduanya berbeda, `Menu.docx` yang dipakai. Folder `Requirement_Auditor` tidak ikut di-commit karena repo ini publik.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Menu | Isi |
+| --- | --- |
+| Login | Username **atau** email. Hanya 2 role: Admin dan Auditor. Dibatasi 5 percobaan per menit, akun nonaktif ditolak. |
+| Daftar Audit | Auditor melihat audit miliknya, admin melihat semua. Cari PT / no. audit, buat audit baru, hapus audit. |
+| 1. Identitas Audit | Client/PT, no. audit, tanggal, tujuan, upload logo, tabel Departemen / Auditee / Auditor. |
+| 2. Checklist Audit | Pilih departemen, criteria bisa lebih dari satu, tabel awal hanya berisi pertanyaan, Hasil Pemeriksaan di kolom paling kanan (Sesuai / Tidak Sesuai lalu Major, Minor, Observasi). Import .xlsx/.csv/.json, export Excel/CSV/JSON, download template. |
+| 3. Daftar Periksa | Lembar formal per departemen (1 departemen = 1 PDF), criteria per item, ringkasan, tanda tangan. |
+| 4. CAR | Otomatis dari setiap temuan Tidak Sesuai. Bagian A sampai E, dengan **C Tindakan Koreksi** dan **D Tindakan Pencegahan** dipisah. Logo tampil. Semua CAR diexport menjadi 1 file PDF. |
+| 5. Rekap Audit | Hitung otomatis per departemen (Total, Sesuai, Major, Minor, Obs, % kepatuhan) + baris rekap manual. PDF landscape. |
+| 6. Kesimpulan Audit | Pengganti menu Arsip: tabel rekap, semua CAR yang sudah diisi, pernyataan akhir tim auditor. PDF. |
+| Admin | Dashboard (jumlah PT, jumlah user, total CAR, rata-rata kepatuhan, **PT hasil audit terbaik**, peringkat), CRUD akun auditor, dokumen CAR per PT (lihat detail dan hapus). |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Semua isian tersimpan otomatis saat kursor pindah dari kolom (indikator "Tersimpan otomatis" di kanan atas).
 
-## Learning Laravel
+**Rumus kepatuhan** (sama dengan prototype): `Sesuai / jumlah pertanyaan terisi x 100`, dibulatkan. Pertanyaan yang belum diperiksa tetap dihitung. Nomor CAR berurutan lintas departemen (CAR-001, CAR-002, ...) mengikuti urutan departemen dan item. Peringkat PT memakai audit **terbaru** tiap PT.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Arsitektur
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Laravel 13** (PHP 8.3+), **Livewire 4** (class-based component) dengan Alpine bawaan Livewire, **Tailwind CSS 4** lewat Vite.
+- **MariaDB/MySQL**. Tabel: `users`, `companies` (PT + logo), `audits`, `audit_departments`, `checklist_items`, `corrective_actions`, `recap_entries`.
+- PDF: `barryvdh/laravel-dompdf` (dibuat di server, font DejaVu Sans dengan subsetting, sekitar 30 sampai 50 KB per file).
+- Spreadsheet: `spatie/simple-excel` (OpenSpout).
+- Ikon: Phosphor (MIT), file SVG disalin ke `resources/svg/ph`, dipanggil dengan `<x-icon name="..." />`. Font Plus Jakarta Sans di-host sendiri lewat plugin font Vite.
+- Laravel Boost terpasang (dev) untuk panduan AI: `CLAUDE.md`, `AGENTS.md`, `.claude/skills`, `.mcp.json`.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+File kunci:
 
-## Agentic Development
+| Lokasi | Isi |
+| --- | --- |
+| `app/Support/AuditReport.php` | Satu-satunya sumber angka rekap, kepatuhan, dan nomor CAR (dipakai halaman dan PDF). |
+| `app/Support/AuditSteps.php` | Urutan 6 menu audit. |
+| `app/Support/ChecklistSpreadsheet.php` | Import/export checklist dan template. |
+| `app/Livewire/Audits/*` | Halaman 6 tahap audit + daftar audit. `AuditStep.php` = base class (otorisasi, data dibatasi per audit). |
+| `app/Livewire/Admin/*` | Dashboard admin, akun auditor, register CAR. |
+| `app/Policies/AuditPolicy.php` | Admin boleh semua, auditor hanya audit miliknya. |
+| `resources/views/livewire/**` | Tampilan halaman. |
+| `resources/views/pdf/**` | Template PDF. |
+| `resources/css/app.css` | Design token (warna navy `brand-900` = `#0f294a`, radius, komponen tombol/field/badge). |
+| `lang/id/validation.php` | Pesan validasi Bahasa Indonesia. |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Menjalankan di lokal (XAMPP)
+
+Kebutuhan: PHP 8.3+ dengan ekstensi `pdo_mysql, mbstring, gd, zip, intl, fileinfo, openssl`, Composer, Node 20+, MariaDB/MySQL.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+# buat database kosong "internal_audit" (utf8mb4) di MariaDB/MySQL, sesuaikan DB_* di .env
+php artisan migrate --seed
+php artisan storage:link
+npm run build
+php artisan serve          # buka http://localhost:8000
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Saat mengembangkan tampilan, jalankan `npm run dev` (atau `composer run dev`) agar CSS langsung diperbarui.
 
-## Contributing
+Akun demo (hanya dibuat di environment selain production):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Role | Username | Password |
+| --- | --- | --- |
+| Admin | `admin` | `admin123` |
+| Auditor | `auditor` | `auditor123` |
 
-## Code of Conduct
+Tombol "Isi cepat akun demo" di halaman login hanya muncul bila `APP_ENV=local`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Perintah lain:
 
-## Security Vulnerabilities
+```bash
+php artisan test --compact        # 84 test
+vendor/bin/pint --dirty           # rapikan format PHP
+php artisan migrate:fresh --seed  # reset database ke data demo (menghapus semua data!)
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Deploy ke hosting
 
-## License
+Aplikasi ini butuh server PHP (bukan hosting statis). Pilihan umum: shared hosting cPanel dengan PHP 8.3+, VPS, atau Laravel Cloud.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Siapkan PHP 8.3+ dengan ekstensi di atas dan database MySQL 8 / MariaDB 10.6+.
+2. Jalankan `npm run build` di lokal, lalu upload project (termasuk `public/build`, tanpa `node_modules`). Atau `git clone` di server lalu `composer install --no-dev --optimize-autoloader`.
+3. Arahkan document root domain ke folder `public/`.
+4. Buat `.env` produksi dari `.env.example`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://domain-klien`, isi `DB_*`, lalu `php artisan key:generate`.
+5. Jalankan:
+   ```bash
+   php artisan migrate --force
+   php artisan db:seed --force      # membuat akun admin dengan password acak, dicetak sekali di terminal
+   php artisan storage:link
+   php artisan optimize
+   ```
+6. Login sebagai admin, buat akun auditor dari menu **Akun Auditor**.
+
+Di production, seeder **tidak** membuat akun demo dan data contoh.
+
+## Mengubah konten
+
+- Teks halaman: file Blade di `resources/views/livewire/...` (Bahasa Indonesia langsung di template).
+- Label hasil, kategori temuan, status CAR: `app/Enums/*.php`.
+- Nama dan urutan menu audit: `app/Support/AuditSteps.php`.
+- Kalimat catatan otomatis rekap: `AuditReport::autoNote()`.
+- Kop dan isi PDF: `resources/views/pdf/*.blade.php`.
+- Warna dan gaya: token di `resources/css/app.css` lalu `npm run build`.
+- Kolom template Excel: `ChecklistSpreadsheet::HEADER` (kolom dibaca berdasarkan posisi: No, Pertanyaan, Catatan, Hasil, Kategori).
+
+## Penyimpangan dari prototype / referensi (dan alasannya)
+
+1. **Urutan menu** mengikuti `Menu.docx`: 4 = CAR, 5 = Rekap (prototype: 4 Rekap, 5 CAR).
+2. **Banyak audit, tersimpan di database.** Prototype hanya satu sesi di localStorage browser. Karena itu "Kosongkan Form", "Isi Data Contoh", dan "Sinkron Sesi PT Aktif" diganti dengan Daftar Audit (buat/hapus audit) dan seeder data demo.
+3. **Tombol akun demo** di login hanya tampil di mode lokal, dan pilihan "Auditee" dihapus (`Menu.docx`: hanya 2 role).
+4. **Lupa password** menampilkan petunjuk menghubungi admin. Admin mengganti password dari menu Akun Auditor. Reset lewat email belum dibuat karena SMTP belum ada.
+5. **Password tidak pernah ditampilkan** di tabel admin (prototype menampilkannya sebagai teks biasa). Minimal 8 karakter (prototype 4).
+6. **Logo** hanya PNG/JPG/WEBP maksimal 2 MB (SVG ditolak demi keamanan). Logo melekat ke PT, jadi otomatis dipakai lagi di audit berikutnya untuk PT yang sama.
+7. **Import** mendukung .xlsx, .csv (termasuk CSV ber-titik-koma dari Excel lokal Indonesia), dan .json. Format lama `.xls` (Excel 97-2003) tidak didukung: simpan ulang sebagai .xlsx. Hasil import **ditambahkan** ke item yang sudah ada, tidak menimpa (prototype menimpa), supaya pekerjaan yang sudah terisi tidak hilang.
+8. **PDF dibuat di server**, bukan lewat dialog print browser, sehingga hasilnya sama di semua perangkat. Export CAR = 1 file berisi 1 CAR per halaman.
+9. **Rekap selalu terhitung otomatis**, sehingga tombol "Hitung Ulang Otomatis" tidak diperlukan. Catatan per departemen bisa diubah dan dikembalikan ke catatan otomatis.
+10. **Criteria per item** bisa diisi di Daftar Periksa. Bila kosong, memakai criteria departemen.
+11. **Auditor hanya melihat audit miliknya**, termasuk saran nama PT saat mengetik. Admin melihat semua.
+12. **Hapus CAR oleh admin** mengikuti prototype: dokumen CAR dihapus dan itemnya ditandai Sesuai (ada konfirmasi yang menjelaskan hal ini).
+13. Tampilan hanya **mode terang** dan hanya **Bahasa Indonesia**. Ini aplikasi internal yang dokumennya untuk dicetak, jadi tidak ada mode gelap atau pengalih EN/ID.
+14. UI disesuaikan, tidak meniru referensi 100%: sidebar navigasi, stepper 6 tahap dengan badge jumlah, kartu pemilih temuan CAR, font Plus Jakarta Sans, dan ikon Phosphor.
+
+## Hasil verifikasi (19 November 2026)
+
+- **84 test otomatis lolos** (dijalankan 3 kali berturut-turut, stabil): login, otorisasi per audit (termasuk ID milik audit lain), perhitungan rekap/kepatuhan/nomor CAR, alur tiap halaman, import xlsx/csv/json, export, keempat PDF, fitur admin, seeder produksi.
+- **Browser sungguhan** (Chrome headless): login, buat audit lewat modal, autosave saat blur (dicek dengan reload), ubah hasil menjadi Tidak Sesuai lalu CAR muncul, isi CAR tampil di Kesimpulan, upload logo tampil di kop, modal bisa ditutup dengan Escape dan fokus terkunci di dalam modal.
+- **Responsif**: semua halaman auditor dan admin di lebar 360, 390, 768, 1024, 1440 tanpa scroll horizontal dan tanpa error console. Tabel lebar (rekap) di-scroll di dalam kotaknya sendiri.
+- **Kontras WCAG AA**: semua pasangan warna teks/latar yang dipakai lolos 4.5:1 (terendah 4.76:1 untuk placeholder).
+- **PDF**: keempat dokumen dicek visual, nomor halaman "Halaman X dari Y" benar.
+- Animasi menghormati `prefers-reduced-motion`.
+
+## Belum teruji / batasan
+
+- Safari/iOS asli dan Firefox belum dicoba (hanya Chrome).
+- Belum dideploy ke hosting sungguhan, dan Lighthouse belum diukur.
+- Aplikasi butuh JavaScript (Livewire), tanpa JS form tidak berfungsi.
+- Dua orang mengedit kolom yang sama pada waktu bersamaan: yang terakhir disimpan yang dipakai.
+- Database lokal XAMPP adalah MariaDB 10.4 (sudah end-of-life). Untuk produksi gunakan MariaDB 10.6+ atau MySQL 8.
+- Lupa password via email belum ada (lihat penyimpangan no. 4).
