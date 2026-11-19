@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}:dept-{{ $departmentId }}">
     <x-audit.header :audit="$audit" current="checklist" :counts="$this->stepCounts">
         <x-slot:actions>
             <x-audit.saving />
@@ -9,7 +9,7 @@
         <x-empty-state icon="buildings" title="Belum ada departemen untuk diberi checklist" class="card">
             Tambahkan departemen di sini atau di halaman Identitas Audit, lalu susun pertanyaan pemeriksaannya.
             <x-slot:actions>
-                <button type="button" wire:click="openDepartmentModal" class="btn btn-primary">
+                <button type="button" wire:click="openDepartmentModal" class="btn btn-add">
                     <x-icon name="plus" class="size-4" />
                     Departemen baru
                 </button>
@@ -60,7 +60,7 @@
                             @endforeach
                         </ol>
                         @error('criteria.*') <p class="field-error">{{ $message }}</p> @enderror
-                        <button type="button" wire:click="addCriterion" class="btn btn-sm btn-soft mt-3">
+                        <button type="button" wire:click="addCriterion" class="btn btn-sm btn-add-soft mt-3">
                             <x-icon name="plus" class="size-4" />
                             Tambah criteria
                         </button>
@@ -73,7 +73,7 @@
                 <div class="flex items-center justify-between gap-3">
                     <h2 id="chk-files" class="flex items-center gap-2 text-base font-bold text-brand-900">
                         <x-icon name="file-xls" class="size-5 text-brand-600" />
-                        Import / export file
+                        Import / export Excel
                     </h2>
                     <a href="{{ route('checklist.template') }}" class="btn btn-sm btn-secondary">
                         <x-icon name="download-simple" class="size-4" />
@@ -82,26 +82,25 @@
                 </div>
 
                 <label class="group relative mt-4 flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-brand-200 bg-brand-50/40 p-4 text-center transition hover:border-brand-500 hover:bg-brand-50">
-                    <input type="file" wire:model="importFile" accept=".xlsx,.csv,.json" class="absolute inset-0 cursor-pointer opacity-0" aria-describedby="import-help">
+                    <input type="file" wire:model="importFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="absolute inset-0 cursor-pointer opacity-0" aria-describedby="import-help">
                     <span wire:loading.flex wire:target="importFile" class="flex-col items-center gap-2 text-sm font-medium text-brand-700">
                         <x-icon name="arrows-clockwise" class="size-6 animate-spin" />
                         Membaca file...
                     </span>
                     <span wire:loading.remove wire:target="importFile" class="flex flex-col items-center">
                         <x-icon name="upload-simple" class="size-7 text-brand-700 transition-transform duration-300 group-hover:-translate-y-0.5" />
-                        <span class="mt-2 text-sm font-semibold text-brand-900">Import file checklist</span>
-                        <span id="import-help" class="mt-0.5 text-xs text-slate-600">Klik atau seret file .xlsx, .csv, atau .json (maks. 2 MB)</span>
+                        <span class="mt-2 text-sm font-semibold text-brand-900">Import file Excel</span>
+                        <span id="import-help" class="mt-0.5 text-xs text-slate-600">Klik atau seret file .xlsx sesuai template (maks. 2 MB)</span>
                     </span>
                 </label>
                 @error('importFile') <p class="field-error">{{ $message }}</p> @enderror
 
-                <div class="mt-auto border-t border-slate-100 pt-4">
+                <div class="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                     <p class="text-xs font-semibold text-slate-600">Export daftar item departemen ini</p>
-                    <div class="mt-2 grid grid-cols-3 gap-2">
-                        <a href="{{ route('audits.checklist.export', [$audit, $department, 'xlsx']) }}" class="btn btn-sm btn-secondary"><x-icon name="file-xls" class="size-4 text-emerald-700" />Excel</a>
-                        <a href="{{ route('audits.checklist.export', [$audit, $department, 'csv']) }}" class="btn btn-sm btn-secondary"><x-icon name="file-csv" class="size-4 text-slate-700" />CSV</a>
-                        <a href="{{ route('audits.checklist.export', [$audit, $department, 'json']) }}" class="btn btn-sm btn-secondary"><x-icon name="brackets-curly" class="size-4 text-brand-700" />JSON</a>
-                    </div>
+                    <a href="{{ route('audits.checklist.export', [$audit, $department]) }}" class="btn btn-sm btn-secondary">
+                        <x-icon name="file-xls" class="size-4 text-emerald-700" />
+                        Export Excel
+                    </a>
                 </div>
             </section>
         </div>
@@ -116,9 +115,9 @@
                     </h2>
                     <p class="mt-1 text-sm text-slate-600">Tulis pertanyaannya dulu. Catatan dan hasil pemeriksaan diisi saat audit berlangsung.</p>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-primary"><x-icon name="plus" class="size-4" />Tambah item</button>
-                    <button type="button" wire:click="addItems(5)" class="btn btn-sm btn-soft">+5 item</button>
+                <div class="flex shrink-0 flex-wrap gap-2">
+                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-add"><x-icon name="plus" class="size-4" />Tambah item</button>
+                    <button type="button" wire:click="addItems(5)" class="btn btn-sm btn-add-soft">+5 item</button>
                     <button type="button" wire:click="clearEmptyItems" class="btn btn-sm btn-secondary"><x-icon name="broom" class="size-4" />Rapikan kosong</button>
                 </div>
             </div>

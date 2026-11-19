@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Audit;
 use App\Models\AuditDepartment;
+use App\Models\ChecklistItem;
 use App\Support\AuditReport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
@@ -37,6 +38,21 @@ class AuditPdfController extends Controller
     {
         return $this->render('pdf.corrective-actions', $audit, 'Dokumen Tindakan Korektif', 'CAR', [
             'findings' => (new AuditReport($audit))->findings(),
+        ]);
+    }
+
+    /**
+     * One CAR as its own file, numbered exactly as in the combined document.
+     * The item is scoped to the audit by the route; an item without a finding has no CAR.
+     */
+    public function correctiveAction(Audit $audit, ChecklistItem $item): Response
+    {
+        $finding = (new AuditReport($audit))->findings()->first(fn (array $finding): bool => $finding['item']->is($item));
+
+        abort_if($finding === null, 404);
+
+        return $this->render('pdf.corrective-actions', $audit, 'Dokumen Tindakan Korektif '.$finding['number'], $finding['number'], [
+            'findings' => collect([$finding]),
         ]);
     }
 

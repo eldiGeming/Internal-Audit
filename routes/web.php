@@ -41,12 +41,12 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::livewire('/rekap', Recap::class)->name('recap');
             Route::livewire('/kesimpulan', Conclusion::class)->name('conclusion');
 
-            Route::get('/departemen/{department}/checklist.{format}', [ChecklistFileController::class, 'export'])
-                ->whereIn('format', ['xlsx', 'csv', 'json'])
+            Route::get('/departemen/{department}/checklist.xlsx', [ChecklistFileController::class, 'export'])
                 ->name('checklist.export');
 
             Route::get('/pdf/daftar-periksa/{department}', [AuditPdfController::class, 'inspection'])->name('pdf.inspection');
             Route::get('/pdf/car', [AuditPdfController::class, 'correctiveActions'])->name('pdf.car');
+            Route::get('/pdf/car/{item}', [AuditPdfController::class, 'correctiveAction'])->name('pdf.car.item');
             Route::get('/pdf/rekap', [AuditPdfController::class, 'recap'])->name('pdf.recap');
             Route::get('/pdf/kesimpulan', [AuditPdfController::class, 'conclusion'])->name('pdf.conclusion');
         });

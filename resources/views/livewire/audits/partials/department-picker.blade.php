@@ -23,7 +23,7 @@
             </button>
         @endforeach
     </div>
-    <button type="button" wire:click="openDepartmentModal" class="btn btn-sm btn-ghost self-start text-brand-800 sm:mb-1 sm:self-end">
+    <button type="button" wire:click="openDepartmentModal" class="btn btn-sm btn-add-ghost self-start sm:mb-1 sm:self-end">
         <x-icon name="plus" class="size-4" />
         Departemen baru
     </button>

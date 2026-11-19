@@ -7,14 +7,13 @@ use App\Livewire\Audits\Concerns\EditsChecklistItems;
 use App\Livewire\Audits\Concerns\ManagesSelectedDepartment;
 use App\Support\ChecklistSpreadsheet;
 use Illuminate\View\View;
-use JsonException;
 use Livewire\Attributes\Title;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Throwable;
 
 /**
- * Step 2: prepare the question list per department (multi-criteria, import/export).
+ * Step 2: prepare the question list per department (multi-criteria, Excel import/export).
  * Per Menu.docx the table starts empty except for the questions; "Hasil Pemeriksaan" is the last column.
  */
 #[Title('Checklist Audit')]
@@ -34,8 +33,9 @@ class Checklist extends AuditStep
     {
         $this->authorizeEdit();
         $this->validate(
-            ['importFile' => ['required', 'file', 'max:2048', 'extensions:xlsx,csv,json']],
-            attributes: ['importFile' => 'file checklist'],
+            ['importFile' => ['required', 'file', 'max:2048', 'extensions:xlsx']],
+            ['importFile.extensions' => 'Import hanya menerima file Excel .xlsx. File .xls lama: buka di Excel lalu simpan ulang sebagai .xlsx.'],
+            ['importFile' => 'file checklist'],
         );
 
         $department = $this->selectedDepartment();
@@ -45,14 +45,10 @@ class Checklist extends AuditStep
         }
 
         try {
-            $rows = ChecklistSpreadsheet::parse($this->importFile->getRealPath(), $this->importFile->getClientOriginalExtension());
-        } catch (JsonException) {
-            $this->addError('importFile', 'Isi file JSON tidak valid.');
-
-            return;
+            $rows = ChecklistSpreadsheet::parse($this->importFile->getRealPath());
         } catch (Throwable $e) {
             report($e);
-            $this->addError('importFile', 'File tidak bisa dibaca. Gunakan template checklist (.xlsx atau .csv).');
+            $this->addError('importFile', 'File Excel tidak bisa dibaca. Unduh template, isi, lalu import lagi.');
 
             return;
         } finally {

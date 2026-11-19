@@ -11,6 +11,7 @@
  * Shape rule: controls (buttons, inputs, switch) 8px radius or less, surfaces (cards, sheets, modals) 12px.
  * No pills: statuses and counts are text (with an icon, severity bars, or a compliance meter), never tinted capsules.
  * Semantic result colors: emerald = Sesuai, red = Major, orange = Minor, amber = Observasi. No other accents.
+ * Buttons: navy = next step / export / save, emerald (.btn-add*) = add new data.
  */
 @theme {
     --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
@@ -88,6 +89,19 @@
 
     .btn-soft {
         @apply bg-brand-50 text-brand-800 ring-1 ring-brand-200 ring-inset hover:bg-brand-100;
+    }
+
+    /* Add / create data. Green so it never reads like the navy "next step" or export actions. */
+    .btn-add {
+        @apply bg-emerald-700 text-white shadow-[0_1px_2px_rgb(4_120_87/0.3)] hover:bg-emerald-800;
+    }
+
+    .btn-add-soft {
+        @apply bg-emerald-50 text-emerald-800 ring-1 ring-emerald-300 ring-inset hover:bg-emerald-100;
+    }
+
+    .btn-add-ghost {
+        @apply text-emerald-800 hover:bg-emerald-50;
     }
 
     .btn-ghost {

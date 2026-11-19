@@ -6,7 +6,7 @@
                 {{ $isAdmin ? 'Seluruh audit dari semua auditor dan perusahaan.' : 'Audit yang Anda kelola. Buka salah satu untuk melanjutkan 6 tahap audit.' }}
             </p>
         </div>
-        <button type="button" wire:click="openCreateModal" class="btn btn-primary group">
+        <button type="button" wire:click="openCreateModal" class="btn btn-add group">
             <x-icon name="plus" class="size-4 transition-transform duration-300 group-hover:rotate-90" />
             Audit baru
         </button>
@@ -31,7 +31,7 @@
                 <x-empty-state icon="folder-open" title="Belum ada audit">
                     Mulai audit baru, lalu isi identitas, checklist, dan hasil pemeriksaan setiap departemen.
                     <x-slot:actions>
-                        <button type="button" wire:click="openCreateModal" class="btn btn-primary">
+                        <button type="button" wire:click="openCreateModal" class="btn btn-add">
                             <x-icon name="plus" class="size-4" />
                             Audit baru
                         </button>
@@ -153,7 +153,7 @@
         </form>
         <x-slot:footer>
             <button type="button" x-on:click="$wire.showCreateModal = false" class="btn btn-secondary">Batal</button>
-            <button type="submit" form="create-audit-form" class="btn btn-primary" wire:loading.attr="disabled" wire:target="createAudit">
+            <button type="submit" form="create-audit-form" class="btn btn-add" wire:loading.attr="disabled" wire:target="createAudit">
                 Buat audit
                 <x-icon name="arrow-right" class="size-4" />
             </button>

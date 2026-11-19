@@ -21,7 +21,7 @@
     </form>
     <x-slot:footer>
         <button type="button" x-on:click="$wire.showDepartmentModal = false" class="btn btn-secondary">Batal</button>
-        <button type="submit" form="department-form" class="btn btn-primary" wire:loading.attr="disabled" wire:target="createDepartment">
+        <button type="submit" form="department-form" class="btn btn-add" wire:loading.attr="disabled" wire:target="createDepartment">
             <x-icon name="plus" class="size-4" />
             Buat departemen
         </button>

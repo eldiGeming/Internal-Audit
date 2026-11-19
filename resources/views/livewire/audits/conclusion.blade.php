@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}">
     <x-audit.header :audit="$audit" current="conclusion" :counts="$this->stepCounts">
         <x-slot:actions>
             <div class="flex items-center gap-3">

@@ -4,7 +4,7 @@
             <h1 class="text-2xl font-extrabold tracking-tight text-brand-900">Akun auditor</h1>
             <p class="mt-1 text-sm text-slate-600">Buat, ubah, nonaktifkan, atau hapus akun login petugas auditor.</p>
         </div>
-        <button type="button" wire:click="create" class="btn btn-primary">
+        <button type="button" wire:click="create" class="btn btn-add">
             <x-icon name="user-plus" class="size-4" />
             Tambah akun auditor
         </button>

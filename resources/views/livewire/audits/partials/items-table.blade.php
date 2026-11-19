@@ -22,7 +22,7 @@
         <x-empty-state icon="list-checks" title="Belum ada item pemeriksaan" class="border-t border-slate-100 bg-white">
             Tambahkan item lalu tulis pertanyaannya, atau impor dari file template.
             <x-slot:actions>
-                <button type="button" wire:click="addItems(1)" class="btn btn-primary">
+                <button type="button" wire:click="addItems(1)" class="btn btn-add">
                     <x-icon name="plus" class="size-4" />
                     Tambah item
                 </button>

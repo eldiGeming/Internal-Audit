@@ -11,14 +11,14 @@ Acuan: prototype `Requirement_Auditor/Internal_audit.txt` (sama dengan [halaman 
 | Login | Username **atau** email. Hanya 2 role: Admin dan Auditor. Dibatasi 5 percobaan per menit, akun nonaktif ditolak. |
 | Daftar Audit | Auditor melihat audit miliknya, admin melihat semua. Cari PT / no. audit, buat audit baru, hapus audit. |
 | 1. Identitas Audit | Client/PT, no. audit, tanggal, tujuan, upload logo, tabel Departemen / Auditee / Auditor. |
-| 2. Checklist Audit | Pilih departemen, criteria bisa lebih dari satu, tabel awal hanya berisi pertanyaan, Hasil Pemeriksaan di kolom paling kanan (Sesuai / Tidak Sesuai lalu Major, Minor, Observasi). Import .xlsx/.csv/.json, export Excel/CSV/JSON, download template. |
+| 2. Checklist Audit | Pilih departemen, criteria bisa lebih dari satu, tabel awal hanya berisi pertanyaan, Hasil Pemeriksaan di kolom paling kanan (Sesuai / Tidak Sesuai lalu Major, Minor, Observasi). Import dan export **hanya Excel (.xlsx)** dengan layout template, download template. |
 | 3. Daftar Periksa | Lembar formal per departemen (1 departemen = 1 PDF), criteria per item, ringkasan, tanda tangan. |
-| 4. CAR | Otomatis dari setiap temuan Tidak Sesuai. Bagian A sampai E, dengan **C Tindakan Koreksi** dan **D Tindakan Pencegahan** dipisah. Logo tampil. Semua CAR diexport menjadi 1 file PDF. |
+| 4. CAR | Otomatis dari setiap temuan Tidak Sesuai. Bagian A sampai E, dengan **C Tindakan Koreksi** dan **D Tindakan Pencegahan** dipisah. Logo tampil. Export PDF **per CAR** (tombol di atas tiap lembar) atau semua CAR dalam 1 file. |
 | 5. Rekap Audit | Hitung otomatis per departemen (Total, Sesuai, Major, Minor, Obs, % kepatuhan) + baris rekap manual. PDF landscape. |
 | 6. Kesimpulan Audit | Pengganti menu Arsip: tabel rekap, semua CAR yang sudah diisi, pernyataan akhir tim auditor. PDF. |
 | Admin | Dashboard (jumlah PT, jumlah user, total CAR, rata-rata kepatuhan, **PT hasil audit terbaik**, peringkat), CRUD akun auditor, dokumen CAR per PT (lihat detail dan hapus). |
 
-Semua isian tersimpan otomatis saat kursor pindah dari kolom (indikator "Tersimpan otomatis" di kanan atas).
+Semua isian tersimpan otomatis ke server saat kursor pindah dari kolom (indikator "Tersimpan otomatis" di kanan atas). Selama mengetik, isian juga disimpan sebagai **draft di browser** (localStorage, `resources/js/drafts.js`). Bila halaman di-reload, tab tertutup, atau koneksi putus sebelum tersimpan, draft dipulihkan saat halaman dibuka lagi lalu dikirim ke server; indikator berubah menjadi "Draft tersimpan di perangkat" selama ada isian yang baru tersimpan lokal. Draft hanya ada di browser yang sama, dihapus begitu server menerimanya, dan kedaluwarsa setelah 7 hari. Kolom password dan pencarian tidak pernah disimpan.
 
 **Rumus kepatuhan** (sama dengan prototype): `Sesuai / jumlah pertanyaan terisi x 100`, dibulatkan. Pertanyaan yang belum diperiksa tetap dihitung. Nomor CAR berurutan lintas departemen (CAR-001, CAR-002, ...) mengikuti urutan departemen dan item. Peringkat PT memakai audit **terbaru** tiap PT.
 
@@ -37,7 +37,8 @@ File kunci:
 | --- | --- |
 | `app/Support/AuditReport.php` | Satu-satunya sumber angka rekap, kepatuhan, dan nomor CAR (dipakai halaman dan PDF). |
 | `app/Support/AuditSteps.php` | Urutan 6 menu audit. |
-| `app/Support/ChecklistSpreadsheet.php` | Import/export checklist dan template. |
+| `app/Support/ChecklistSpreadsheet.php` | Import/export checklist Excel (.xlsx) dan template. |
+| `resources/js/drafts.js` | Draft isian di localStorage agar tidak hilang saat reload. |
 | `app/Livewire/Audits/*` | Halaman 6 tahap audit + daftar audit. `AuditStep.php` = base class (otorisasi, data dibatasi per audit). |
 | `app/Livewire/Admin/*` | Dashboard admin, akun auditor, register CAR. |
 | `app/Policies/AuditPolicy.php` | Admin boleh semua, auditor hanya audit miliknya. |
@@ -77,7 +78,7 @@ Tombol "Isi cepat akun demo" di halaman login hanya muncul bila `APP_ENV=local`.
 Perintah lain:
 
 ```bash
-php artisan test --compact        # 84 test
+php artisan test --compact        # 87 test
 vendor/bin/pint --dirty           # rapikan format PHP
 php artisan migrate:fresh --seed  # reset database ke data demo (menghapus semua data!)
 ```
@@ -119,7 +120,7 @@ Di production, seeder **tidak** membuat akun demo dan data contoh.
 4. **Lupa password** menampilkan petunjuk menghubungi admin. Admin mengganti password dari menu Akun Auditor. Reset lewat email belum dibuat karena SMTP belum ada.
 5. **Password tidak pernah ditampilkan** di tabel admin (prototype menampilkannya sebagai teks biasa). Minimal 8 karakter (prototype 4).
 6. **Logo** hanya PNG/JPG/WEBP maksimal 2 MB (SVG ditolak demi keamanan). Logo melekat ke PT, jadi otomatis dipakai lagi di audit berikutnya untuk PT yang sama.
-7. **Import** mendukung .xlsx, .csv (termasuk CSV ber-titik-koma dari Excel lokal Indonesia), dan .json. Format lama `.xls` (Excel 97-2003) tidak didukung: simpan ulang sebagai .xlsx. Hasil import **ditambahkan** ke item yang sudah ada, tidak menimpa (prototype menimpa), supaya pekerjaan yang sudah terisi tidak hilang.
+7. **Import/export checklist hanya Excel (.xlsx)** sesuai permintaan (20 November 2026); CSV dan JSON dihapus. File hasil export bisa langsung diimpor lagi. Format lama `.xls` (Excel 97-2003) ditolak dengan pesan untuk menyimpan ulang sebagai .xlsx. Hasil import **ditambahkan** ke item yang sudah ada, tidak menimpa (prototype menimpa), supaya pekerjaan yang sudah terisi tidak hilang.
 8. **PDF dibuat di server**, bukan lewat dialog print browser, sehingga hasilnya sama di semua perangkat. Export CAR = 1 file berisi 1 CAR per halaman.
 9. **Rekap selalu terhitung otomatis**, sehingga tombol "Hitung Ulang Otomatis" tidak diperlukan. Catatan per departemen bisa diubah dan dikembalikan ke catatan otomatis.
 10. **Criteria per item** bisa diisi di Daftar Periksa. Bila kosong, memakai criteria departemen.
@@ -135,10 +136,12 @@ Di production, seeder **tidak** membuat akun demo dan data contoh.
     - Status akun auditor: switch sungguhan (`role="switch"`), karena kolom itu memang tombol on/off.
     - Kartu KPI berikon diganti satu baris angka bergaris pemisah. Lingkaran ikon di tampilan kosong, avatar bulat, dan label kecil huruf kapital di atas judul dokumen dihapus.
     - Pemilih departemen menjadi tab bergaris bawah, stepper menjadi rel dengan garis penanda langkah aktif.
+16. **Warna tombol berdasarkan jenis aksi**: navy untuk lanjut ke langkah berikutnya, export, dan simpan; hijau (`.btn-add`, `.btn-add-soft`, `.btn-add-ghost`) untuk semua aksi tambah data (audit, departemen, item, baris, criteria, rekap manual, akun auditor).
 
-## Hasil verifikasi (19 November 2026)
+## Hasil verifikasi (19 dan 20 November 2026)
 
-- **84 test otomatis lolos** (dijalankan 3 kali berturut-turut, stabil): login, otorisasi per audit (termasuk ID milik audit lain), perhitungan rekap/kepatuhan/nomor CAR, alur tiap halaman, import xlsx/csv/json, export, keempat PDF, fitur admin, seeder produksi.
+- **87 test otomatis lolos** (20 November 2026): login, otorisasi per audit (termasuk ID milik audit lain), perhitungan rekap/kepatuhan/nomor CAR, alur tiap halaman, import Excel (file lain ditolak), export Excel yang bisa diimpor ulang, keempat PDF plus PDF per CAR (item milik audit lain atau item Sesuai ditolak 404), fitur admin, seeder produksi.
+- **Draft browser** (Chrome headless, 20 November 2026): mengetik di Kesimpulan, pertanyaan Checklist, dan akar masalah CAR lalu langsung reload tanpa keluar kolom: isian kembali, terkirim ke server, draft terhapus. Simulasi offline: simpan gagal, draft bertahan, setelah online dan reload isian tersimpan.
 - **Browser sungguhan** (Chrome headless): login, buat audit lewat modal, autosave saat blur (dicek dengan reload), ubah hasil menjadi Tidak Sesuai lalu CAR muncul, isi CAR tampil di Kesimpulan, upload logo tampil di kop, modal bisa ditutup dengan Escape dan fokus terkunci di dalam modal.
 - **Responsif**: semua halaman auditor dan admin di lebar 360, 390, 768, 1024, 1440 tanpa scroll horizontal dan tanpa error console (diulang 20 November 2026 setelah penggantian pill). Tabel lebar (rekap) di-scroll di dalam kotaknya sendiri. Di ponsel, stepper otomatis menggulir ke langkah yang sedang dibuka.
 - **Kontras WCAG AA**: semua pasangan warna teks/latar yang dipakai lolos 4.5:1 (terendah 4.76:1 untuk placeholder).
@@ -150,6 +153,8 @@ Di production, seeder **tidak** membuat akun demo dan data contoh.
 - Safari/iOS asli dan Firefox belum dicoba (hanya Chrome).
 - Belum dideploy ke hosting sungguhan, dan Lighthouse belum diukur.
 - Aplikasi butuh JavaScript (Livewire), tanpa JS form tidak berfungsi.
-- Dua orang mengedit kolom yang sama pada waktu bersamaan: yang terakhir disimpan yang dipakai.
+- Dua orang mengedit kolom yang sama pada waktu bersamaan: yang terakhir disimpan yang dipakai. Draft browser yang dipulihkan juga ikut aturan ini (isian lokal yang belum terkirim menang saat dipulihkan).
+- Draft hanya di browser dan perangkat yang sama; pindah perangkat sebelum kolom tersimpan tetap kehilangan ketikan itu. Mode private/incognito atau storage yang diblokir: draft tidak tersimpan, autosave server tetap jalan.
+- Form di dalam modal (buat audit, departemen baru, akun auditor) tidak memakai draft.
 - Database lokal XAMPP adalah MariaDB 10.4 (sudah end-of-life). Untuk produksi gunakan MariaDB 10.6+ atau MySQL 8.
 - Lupa password via email belum ada (lihat penyimpangan no. 4).

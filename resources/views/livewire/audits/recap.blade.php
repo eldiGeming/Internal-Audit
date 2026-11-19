@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}">
     <x-audit.header :audit="$audit" current="recap" :counts="$this->stepCounts">
         <x-slot:actions>
             <x-audit.saving />
@@ -8,7 +8,7 @@
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p class="max-w-2xl text-sm text-slate-600">Angka setiap departemen dihitung langsung dari hasil pemeriksaan. Gunakan baris manual untuk departemen yang diaudit di luar aplikasi.</p>
         <div class="flex flex-wrap gap-2">
-            <button type="button" wire:click="addManualEntry" class="btn btn-sm btn-secondary"><x-icon name="plus" class="size-4" />Tambah rekap manual</button>
+            <button type="button" wire:click="addManualEntry" class="btn btn-sm btn-add-soft"><x-icon name="plus" class="size-4" />Tambah rekap manual</button>
             <a href="{{ route('audits.pdf.recap', $audit) }}" target="_blank" class="btn btn-sm btn-primary"><x-icon name="file-pdf" class="size-4" />Download PDF rekap</a>
         </div>
     </div>

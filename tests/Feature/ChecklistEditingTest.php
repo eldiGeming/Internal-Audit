@@ -13,6 +13,7 @@ use App\Support\ChecklistSpreadsheet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -128,7 +129,7 @@ class ChecklistEditingTest extends TestCase
     #[Test]
     public function an_xlsx_template_imports_questions_results_and_categories(): void
     {
-        $path = ChecklistSpreadsheet::writeTemporary('xlsx', [
+        $path = ChecklistSpreadsheet::writeTemporary([
             [1, 'Apakah SOP tersedia?', 'SOP terpasang', 'SESUAI', ''],
             [2, 'Apakah alat ukur terkalibrasi?', 'Lewat jadwal', 'TIDAK SESUAI', 'Minor'],
             [3, '', '', '', ''],
@@ -146,42 +147,36 @@ class ChecklistEditingTest extends TestCase
     }
 
     #[Test]
-    public function a_semicolon_separated_csv_from_indonesian_excel_is_imported(): void
-    {
-        $csv = "No;Pertanyaan;Catatan;Hasil;Kategori\n1;Apakah APAR siap pakai?;;Tidak Sesuai;Observasi\n";
-
-        $this->checklist()->set('importFile', UploadedFile::fake()->createWithContent('checklist.csv', $csv));
-
-        $item = $this->department->items()->sole();
-        $this->assertSame('Apakah APAR siap pakai?', $item->question);
-        $this->assertSame(FindingSeverity::Observasi, $item->severity);
-    }
-
-    #[Test]
-    public function json_exported_by_the_app_can_be_imported_again(): void
-    {
-        $json = json_encode(['items' => [['question' => 'Apakah form terisi?', 'result' => 'SESUAI']]]);
-
-        $this->checklist()->set('importFile', UploadedFile::fake()->createWithContent('checklist.json', $json));
-
-        $this->assertSame(CheckResult::Sesuai, $this->department->items()->sole()->result);
-    }
-
-    #[Test]
-    public function an_invalid_json_file_shows_an_error_and_imports_nothing(): void
+    public function a_corrupt_xlsx_file_shows_an_error_and_imports_nothing(): void
     {
         $this->checklist()
-            ->set('importFile', UploadedFile::fake()->createWithContent('checklist.json', '{rusak'))
+            ->set('importFile', UploadedFile::fake()->createWithContent('checklist.xlsx', 'bukan file excel'))
             ->assertHasErrors('importFile');
 
         $this->assertSame(0, $this->department->items()->count());
     }
 
     #[Test]
-    public function unsupported_file_types_are_rejected(): void
+    #[DataProvider('nonExcelFiles')]
+    public function only_xlsx_files_can_be_imported(string $filename, string $content): void
     {
         $this->checklist()
-            ->set('importFile', UploadedFile::fake()->create('checklist.pdf', 10))
-            ->assertHasErrors('importFile');
+            ->set('importFile', UploadedFile::fake()->createWithContent($filename, $content))
+            ->assertHasErrors(['importFile' => 'extensions']);
+
+        $this->assertSame(0, $this->department->items()->count());
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function nonExcelFiles(): array
+    {
+        return [
+            'csv' => ['checklist.csv', "No;Pertanyaan;Catatan;Hasil;Kategori\n1;Apakah APAR siap pakai?;;Tidak Sesuai;Observasi\n"],
+            'json' => ['checklist.json', '{"items":[{"question":"Apakah form terisi?","result":"SESUAI"}]}'],
+            'old xls' => ['checklist.xls', 'excel 97-2003'],
+            'pdf' => ['checklist.pdf', '%PDF-1.4'],
+        ];
     }
 }

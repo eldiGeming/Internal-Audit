@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}">
     <x-audit.header :audit="$audit" current="identity" :counts="$this->stepCounts">
         <x-slot:actions>
             <x-audit.saving />
@@ -97,7 +97,7 @@
                 </h2>
                 <p class="mt-1 text-sm text-slate-600">Setiap departemen otomatis menjadi lembar Checklist, Daftar Periksa, dan baris Rekap.</p>
             </div>
-            <button type="button" wire:click="addDepartment" class="btn btn-primary shrink-0">
+            <button type="button" wire:click="addDepartment" class="btn btn-add shrink-0">
                 <x-icon name="plus" class="size-4" />
                 Tambah departemen
             </button>

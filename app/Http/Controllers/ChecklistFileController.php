@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Audit;
 use App\Models\AuditDepartment;
 use App\Support\ChecklistSpreadsheet;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -16,7 +15,7 @@ class ChecklistFileController extends Controller
      */
     public function template(): BinaryFileResponse
     {
-        $path = ChecklistSpreadsheet::writeTemporary('xlsx', [
+        $path = ChecklistSpreadsheet::writeTemporary([
             [1, 'Apakah SOP operasional tersedia di area kerja?', '', '', ''],
             [2, 'Apakah catatan inspeksi harian terisi lengkap?', '', '', ''],
         ]);
@@ -25,31 +24,16 @@ class ChecklistFileController extends Controller
     }
 
     /**
-     * Export the checklist of one department as xlsx, csv or json.
+     * Export the checklist of one department as xlsx, in the template layout so it can be imported again.
      */
-    public function export(Audit $audit, AuditDepartment $department, string $format): BinaryFileResponse|JsonResponse
+    public function export(Audit $audit, AuditDepartment $department): BinaryFileResponse
     {
         $department->load('items');
-        $filename = 'Checklist_'.Str::slug($department->displayName(), '_').'.'.$format;
 
-        if ($format === 'json') {
-            return response()->json([
-                'dept' => $department->name,
-                'auditee' => $department->auditee,
-                'auditor' => $department->auditor,
-                'criteria' => $department->criteriaList(),
-                'items' => array_map(fn (array $row): array => [
-                    'question' => $row[1],
-                    'evidence' => $row[2],
-                    'result' => $row[3],
-                    'severity' => $row[4],
-                ], ChecklistSpreadsheet::rowsFor($department)),
-            ], options: JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-                ->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        }
+        $path = ChecklistSpreadsheet::writeTemporary(ChecklistSpreadsheet::rowsFor($department));
 
-        $path = ChecklistSpreadsheet::writeTemporary($format, ChecklistSpreadsheet::rowsFor($department));
-
-        return response()->download($path, $filename)->deleteFileAfterSend();
+        return response()
+            ->download($path, 'Checklist_'.Str::slug($department->displayName(), '_').'.xlsx')
+            ->deleteFileAfterSend();
     }
 }

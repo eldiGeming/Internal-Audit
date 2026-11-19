@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}">
     <x-audit.header :audit="$audit" current="car" :counts="$this->stepCounts">
         <x-slot:actions>
             <x-audit.saving />
@@ -57,6 +57,19 @@
             @endphp
             @continue(! isset($cars[$item->id]))
             <article id="{{ Str::lower($finding['number']) }}" wire:key="car-{{ $item->id }}" class="sheet scroll-mt-6 p-5 sm:p-8">
+                {{-- Viewer bar above the paper: actions for this one CAR, kept apart from the document content. --}}
+                <div class="-mx-5 -mt-5 mb-5 flex flex-wrap items-center justify-between gap-2 rounded-t-xl border-b border-slate-200 bg-slate-50 px-5 py-2.5 sm:-mx-8 sm:-mt-8 sm:mb-8 sm:px-8">
+                    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                        <span class="font-extrabold text-brand-900 tabular-nums">{{ $finding['number'] }}</span>
+                        <span class="font-semibold text-slate-700">{{ $department->displayName() }}</span>
+                        <x-severity :severity="$finding['severity']" />
+                    </p>
+                    <a href="{{ route('audits.pdf.car.item', [$audit, $item]) }}" target="_blank" class="btn btn-sm btn-secondary">
+                        <x-icon name="file-pdf" class="size-4" />
+                        PDF {{ $finding['number'] }}
+                    </a>
+                </div>
+
                 <div class="flex flex-col-reverse gap-4 border-b-2 border-brand-900 pb-5 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <h3 class="text-lg font-extrabold text-brand-900 uppercase sm:text-xl">Dokumen tindakan korektif &amp; pencegahan</h3>

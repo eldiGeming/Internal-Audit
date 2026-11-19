@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CheckResult;
 use App\Models\Audit;
 use App\Models\AuditDepartment;
 use App\Models\ChecklistItem;
 use App\Models\User;
+use App\Support\ChecklistSpreadsheet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -45,29 +47,54 @@ class DocumentExportTest extends TestCase
     }
 
     #[Test]
-    public function the_checklist_exports_as_xlsx_and_csv(): void
+    public function a_single_car_exports_as_its_own_pdf(): void
     {
-        $this->actingAs($this->audit->user);
+        $finding = $this->department->items()->where('result', CheckResult::TidakSesuai)->sole();
 
-        $this->get(route('audits.checklist.export', [$this->audit, $this->department, 'xlsx']))
+        $response = $this->actingAs($this->audit->user)
+            ->get(route('audits.pdf.car.item', [$this->audit, $finding]))
             ->assertOk()
-            ->assertDownload('Checklist_produksi.xlsx');
+            ->assertHeader('content-type', 'application/pdf');
 
-        $csv = $this->get(route('audits.checklist.export', [$this->audit, $this->department, 'csv']))->assertOk();
-        $this->assertStringContainsString('Apakah SOP tersedia?', file_get_contents($csv->baseResponse->getFile()->getPathname()));
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+        $this->assertStringContainsString('filename=car_001_', $response->headers->get('content-disposition'));
     }
 
     #[Test]
-    public function the_json_export_contains_the_filled_questions(): void
+    public function only_a_finding_of_this_audit_has_a_car_pdf(): void
     {
-        $this->actingAs($this->audit->user)
-            ->get(route('audits.checklist.export', [$this->audit, $this->department, 'json']))
+        $compliantItem = $this->department->items()->where('result', CheckResult::Sesuai)->sole();
+        $findingOfAnotherAudit = ChecklistItem::factory()->finding()->create();
+
+        $this->actingAs($this->audit->user);
+
+        $this->get(route('audits.pdf.car.item', [$this->audit, $compliantItem]))->assertNotFound();
+        $this->get(route('audits.pdf.car.item', [$this->audit, $findingOfAnotherAudit]))->assertNotFound();
+    }
+
+    #[Test]
+    public function the_checklist_exports_as_xlsx_that_imports_back_unchanged(): void
+    {
+        $response = $this->actingAs($this->audit->user)
+            ->get(route('audits.checklist.export', [$this->audit, $this->department]))
             ->assertOk()
-            ->assertHeader('content-disposition', 'attachment; filename="Checklist_produksi.json"')
-            ->assertJsonPath('dept', 'Produksi')
-            ->assertJsonPath('items.0.question', 'Apakah SOP tersedia?')
-            ->assertJsonPath('items.0.result', 'SESUAI')
-            ->assertJsonCount(2, 'items');
+            ->assertDownload('Checklist_produksi.xlsx');
+
+        $rows = ChecklistSpreadsheet::parse($response->baseResponse->getFile()->getPathname());
+
+        $this->assertCount(2, $rows);
+        $this->assertSame('Apakah SOP tersedia?', $rows[0]['question']);
+        $this->assertSame(CheckResult::Sesuai, $rows[0]['result']);
+    }
+
+    #[Test]
+    public function the_checklist_is_not_exported_as_csv_or_json(): void
+    {
+        $this->actingAs($this->audit->user);
+        $base = "/audits/{$this->audit->id}/departemen/{$this->department->id}/checklist";
+
+        $this->get($base.'.csv')->assertNotFound();
+        $this->get($base.'.json')->assertNotFound();
     }
 
     #[Test]
@@ -83,7 +110,7 @@ class DocumentExportTest extends TestCase
     public function another_auditor_cannot_export_this_checklist(): void
     {
         $this->actingAs(User::factory()->create())
-            ->get(route('audits.checklist.export', [$this->audit, $this->department, 'xlsx']))
+            ->get(route('audits.checklist.export', [$this->audit, $this->department]))
             ->assertForbidden();
     }
 }

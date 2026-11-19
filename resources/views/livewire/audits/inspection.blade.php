@@ -1,4 +1,4 @@
-<div>
+<div data-draft-scope="audit-{{ $audit->id }}:dept-{{ $departmentId }}">
     <x-audit.header :audit="$audit" current="inspection" :counts="$this->stepCounts">
         <x-slot:actions>
             <div class="flex flex-wrap items-center gap-3">
@@ -17,7 +17,7 @@
         <x-empty-state icon="file-text" title="Belum ada lembar daftar periksa" class="card">
             Setiap departemen menjadi satu lembar daftar periksa. Tambahkan departemen untuk memulai.
             <x-slot:actions>
-                <button type="button" wire:click="openDepartmentModal" class="btn btn-primary">
+                <button type="button" wire:click="openDepartmentModal" class="btn btn-add">
                     <x-icon name="plus" class="size-4" />
                     Departemen baru
                 </button>
@@ -58,7 +58,7 @@
             <div class="mt-6">
                 @include('livewire.audits.partials.items-table', ['withCriteria' => true])
                 @if ($department->items->isNotEmpty())
-                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-ghost mt-2 text-brand-800">
+                    <button type="button" wire:click="addItems(1)" class="btn btn-sm btn-add-ghost mt-2">
                         <x-icon name="plus" class="size-4" />
                         Tambah baris
                     </button>
