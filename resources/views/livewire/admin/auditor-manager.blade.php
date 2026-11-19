@@ -20,10 +20,7 @@
         </div>
 
         @if ($auditors->isEmpty())
-            <div class="flex flex-col items-center px-6 py-14 text-center">
-                <span class="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-700"><x-icon name="users" class="size-6" /></span>
-                <p class="mt-3 text-sm font-semibold text-slate-800">{{ $search !== '' ? 'Tidak ada auditor yang cocok.' : 'Belum ada akun auditor.' }}</p>
-            </div>
+            <x-empty-state icon="users" :title="$search !== '' ? 'Tidak ada auditor yang cocok.' : 'Belum ada akun auditor.'" />
         @else
             <div class="relative overflow-x-auto">
                 <table class="data-table min-w-[760px]">
@@ -49,11 +46,23 @@
                                 </td>
                                 <td class="text-slate-700">{{ $auditor->team ?: '-' }}</td>
                                 <td class="text-center tabular-nums">{{ $auditor->audits_count }}</td>
-                                <td class="text-center">
-                                    <button type="button" wire:click="toggleActive({{ $auditor->id }})"
-                                            @class(['badge cursor-pointer transition hover:opacity-80', 'bg-emerald-50 text-emerald-800 ring-emerald-200' => $auditor->is_active, 'bg-slate-100 text-slate-700 ring-slate-300' => ! $auditor->is_active])
-                                            title="Klik untuk {{ $auditor->is_active ? 'menonaktifkan' : 'mengaktifkan' }}">
-                                        {{ $auditor->is_active ? 'Aktif' : 'Nonaktif' }}
+                                <td>
+                                    {{-- A real switch: this cell toggles login access, so it should look like a control, not a label. --}}
+                                    <button type="button" role="switch" aria-checked="{{ $auditor->is_active ? 'true' : 'false' }}"
+                                            wire:click="toggleActive({{ $auditor->id }})"
+                                            aria-label="Akses login {{ $auditor->name }}"
+                                            class="group mx-auto flex min-h-9 items-center gap-2.5 rounded-md px-1 text-sm font-semibold">
+                                        <span @class([
+                                            'relative h-5 w-9 shrink-0 rounded-[5px] transition-colors duration-200',
+                                            'bg-emerald-600 group-hover:bg-emerald-700' => $auditor->is_active,
+                                            'bg-slate-300 group-hover:bg-slate-400' => ! $auditor->is_active,
+                                        ])>
+                                            <span @class([
+                                                'absolute top-0.5 left-0.5 size-4 rounded-[3px] bg-white shadow-sm transition-transform duration-200 ease-out-soft',
+                                                'translate-x-4' => $auditor->is_active,
+                                            ])></span>
+                                        </span>
+                                        <span @class(['w-16 text-left', 'text-emerald-800' => $auditor->is_active, 'text-slate-600' => ! $auditor->is_active])>{{ $auditor->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                                     </button>
                                 </td>
                                 <td>

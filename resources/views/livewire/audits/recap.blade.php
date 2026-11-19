@@ -13,22 +13,15 @@
         </div>
     </div>
 
-    <dl class="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        @foreach ([
-            ['label' => 'Total departemen', 'value' => $totals['departments'], 'icon' => 'buildings', 'class' => 'text-brand-900'],
-            ['label' => 'Total item diperiksa', 'value' => $totals['total'], 'icon' => 'list-checks', 'class' => 'text-brand-700'],
-            ['label' => 'Total sesuai', 'value' => $totals['sesuai'], 'icon' => 'check-circle', 'class' => 'text-emerald-700'],
-            ['label' => 'Total tidak sesuai', 'value' => $totals['findings'], 'icon' => 'warning-octagon', 'class' => 'text-red-700'],
-        ] as $kpi)
-            <div class="card p-4">
-                <dt class="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">{{ $kpi['label'] }}<x-icon :name="$kpi['icon']" class="size-5 {{ $kpi['class'] }}" /></dt>
-                <dd class="mt-1 text-3xl font-extrabold tabular-nums {{ $kpi['class'] }}">{{ $kpi['value'] }}</dd>
-            </div>
-        @endforeach
-    </dl>
+    <x-stat-strip class="mb-5 lg:grid-cols-4" :stats="[
+        ['label' => 'Departemen', 'value' => $totals['departments']],
+        ['label' => 'Item diperiksa', 'value' => $totals['total']],
+        ['label' => 'Sesuai', 'value' => $totals['sesuai'], 'tone' => 'text-emerald-700'],
+        ['label' => 'Tidak sesuai', 'value' => $totals['findings'], 'tone' => 'text-red-700'],
+    ]" />
 
     <article class="sheet p-5 sm:p-8">
-        <x-audit.doc-header :company="$audit->company" kicker="Laporan konsolidasi lintas departemen" title="Rekap Hasil Audit">
+        <x-audit.doc-header :company="$audit->company" title="Rekap Hasil Audit">
             <p>Client: <strong class="text-slate-900">{{ $audit->company->name }}</strong></p>
             <p>No. audit: <strong class="text-slate-900">{{ $audit->audit_number ?: '-' }}</strong>, tanggal: <strong class="text-slate-900">{{ $audit->audit_date?->translatedFormat('d F Y') ?? '-' }}</strong></p>
         </x-audit.doc-header>
@@ -77,7 +70,7 @@
                                         @error("{$base}.{$field}") <p class="field-error">{{ $message }}</p> @enderror
                                     </td>
                                 @endforeach
-                                <td class="text-center"><x-compliance-badge :value="$row['compliance']" :empty="$row['total'] === 0" /></td>
+                                <td class="text-center"><x-compliance :value="$row['compliance']" :empty="$row['total'] === 0" /></td>
                                 <td>
                                     <label for="{{ $base }}-note" class="sr-only">Catatan</label>
                                     <textarea id="{{ $base }}-note" rows="2" wire:model.live.blur="{{ $base }}.note" class="field min-h-0 px-2 py-1.5 text-sm" placeholder="{{ $row['auto_note'] }}"></textarea>
@@ -91,7 +84,7 @@
                                 <td class="text-center font-bold text-red-700 tabular-nums">{{ $row['major'] }}</td>
                                 <td class="text-center font-bold text-orange-700 tabular-nums">{{ $row['minor'] }}</td>
                                 <td class="text-center font-bold text-amber-700 tabular-nums">{{ $row['observasi'] }}</td>
-                                <td class="text-center"><x-compliance-badge :value="$row['compliance']" :empty="$row['total'] === 0" /></td>
+                                <td class="text-center"><x-compliance :value="$row['compliance']" :empty="$row['total'] === 0" /></td>
                                 <td x-data="{ editing: @js(filled($notes[$row['id']] ?? '')) }" wire:key="note-{{ $row['id'] }}-{{ filled($notes[$row['id']] ?? '') ? 'custom' : 'auto' }}">
                                     <div x-show="! editing" class="flex items-start justify-between gap-2">
                                         <p class="pt-1 text-sm text-slate-700">{{ $row['auto_note'] }}</p>
@@ -125,7 +118,7 @@
                             <td class="text-center text-red-800 tabular-nums">{{ $totals['major'] }}</td>
                             <td class="text-center text-orange-800 tabular-nums">{{ $totals['minor'] }}</td>
                             <td class="text-center text-amber-800 tabular-nums">{{ $totals['observasi'] }}</td>
-                            <td class="text-center"><x-compliance-badge :value="$totals['compliance']" :empty="$totals['total'] === 0" /></td>
+                            <td class="text-center"><x-compliance :value="$totals['compliance']" :empty="$totals['total'] === 0" /></td>
                             <td class="text-xs font-semibold text-slate-600">Konsolidasi seluruh departemen</td>
                         </tr>
                     </tfoot>

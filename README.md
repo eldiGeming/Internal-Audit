@@ -43,7 +43,8 @@ File kunci:
 | `app/Policies/AuditPolicy.php` | Admin boleh semua, auditor hanya audit miliknya. |
 | `resources/views/livewire/**` | Tampilan halaman. |
 | `resources/views/pdf/**` | Template PDF. |
-| `resources/css/app.css` | Design token (warna navy `brand-900` = `#0f294a`, radius, komponen tombol/field/badge). |
+| `resources/css/app.css` | Design token (warna navy `brand-900` = `#0f294a`, radius, komponen tombol/field/tabel). |
+| `resources/views/components/{severity,compliance,car-status,stat-strip,empty-state}.blade.php` | Penanda kategori temuan (3 bar), meter kepatuhan, status CAR, baris angka ringkasan, tampilan kosong. |
 | `lang/id/validation.php` | Pesan validasi Bahasa Indonesia. |
 
 ## Menjalankan di lokal (XAMPP)
@@ -125,13 +126,21 @@ Di production, seeder **tidak** membuat akun demo dan data contoh.
 11. **Auditor hanya melihat audit miliknya**, termasuk saran nama PT saat mengetik. Admin melihat semua.
 12. **Hapus CAR oleh admin** mengikuti prototype: dokumen CAR dihapus dan itemnya ditandai Sesuai (ada konfirmasi yang menjelaskan hal ini).
 13. Tampilan hanya **mode terang** dan hanya **Bahasa Indonesia**. Ini aplikasi internal yang dokumennya untuk dicetak, jadi tidak ada mode gelap atau pengalih EN/ID.
-14. UI disesuaikan, tidak meniru referensi 100%: sidebar navigasi, stepper 6 tahap dengan badge jumlah, kartu pemilih temuan CAR, font Plus Jakarta Sans, dan ikon Phosphor.
+14. UI disesuaikan, tidak meniru referensi 100%: sidebar navigasi, stepper 6 tahap dengan angka jumlah, kartu pemilih temuan CAR, font Plus Jakarta Sans, dan ikon Phosphor.
+15. **Tanpa pill/badge kapsul** (20 November 2026). Label berwarna berbentuk kapsul diganti bentuk yang membawa arti sendiri:
+    - Kategori temuan: 3 bar naik (Major 3, Minor 2, Observasi 1) plus teks, tetap terbaca tanpa warna.
+    - Kepatuhan: angka % plus meter pendek (hijau ≥85%, kuning ≥60%, merah di bawahnya).
+    - Status CAR: ikon jam (Open) atau centang (Closed) plus teks.
+    - Jumlah (temuan, pertanyaan, CAR): teks biasa di samping judul.
+    - Status akun auditor: switch sungguhan (`role="switch"`), karena kolom itu memang tombol on/off.
+    - Kartu KPI berikon diganti satu baris angka bergaris pemisah. Lingkaran ikon di tampilan kosong, avatar bulat, dan label kecil huruf kapital di atas judul dokumen dihapus.
+    - Pemilih departemen menjadi tab bergaris bawah, stepper menjadi rel dengan garis penanda langkah aktif.
 
 ## Hasil verifikasi (19 November 2026)
 
 - **84 test otomatis lolos** (dijalankan 3 kali berturut-turut, stabil): login, otorisasi per audit (termasuk ID milik audit lain), perhitungan rekap/kepatuhan/nomor CAR, alur tiap halaman, import xlsx/csv/json, export, keempat PDF, fitur admin, seeder produksi.
 - **Browser sungguhan** (Chrome headless): login, buat audit lewat modal, autosave saat blur (dicek dengan reload), ubah hasil menjadi Tidak Sesuai lalu CAR muncul, isi CAR tampil di Kesimpulan, upload logo tampil di kop, modal bisa ditutup dengan Escape dan fokus terkunci di dalam modal.
-- **Responsif**: semua halaman auditor dan admin di lebar 360, 390, 768, 1024, 1440 tanpa scroll horizontal dan tanpa error console. Tabel lebar (rekap) di-scroll di dalam kotaknya sendiri.
+- **Responsif**: semua halaman auditor dan admin di lebar 360, 390, 768, 1024, 1440 tanpa scroll horizontal dan tanpa error console (diulang 20 November 2026 setelah penggantian pill). Tabel lebar (rekap) di-scroll di dalam kotaknya sendiri. Di ponsel, stepper otomatis menggulir ke langkah yang sedang dibuka.
 - **Kontras WCAG AA**: semua pasangan warna teks/latar yang dipakai lolos 4.5:1 (terendah 4.76:1 untuk placeholder).
 - **PDF**: keempat dokumen dicek visual, nomor halaman "Halaman X dari Y" benar.
 - Animasi menghormati `prefers-reduced-motion`.

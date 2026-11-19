@@ -4,37 +4,17 @@
         <p class="mt-1 text-sm text-slate-600">Ringkasan seluruh perusahaan, akun auditor, dan temuan audit.</p>
     </div>
 
-    <dl class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div class="card p-4 sm:p-5">
-            <dt class="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">Jumlah PT <x-icon name="buildings" class="size-5 text-brand-700" /></dt>
-            <dd class="mt-1 text-3xl font-extrabold text-brand-900 tabular-nums">{{ $companiesCount }}</dd>
-            <dd class="text-xs text-slate-600">{{ $auditsCount }} audit tercatat</dd>
-        </div>
-        <div class="card p-4 sm:p-5">
-            <dt class="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">Jumlah user auditor <x-icon name="users" class="size-5 text-brand-700" /></dt>
-            <dd class="mt-1 text-3xl font-extrabold text-brand-900 tabular-nums">{{ $auditorsCount }}</dd>
-            <dd class="text-xs text-slate-600">{{ $activeAuditorsCount }} akun aktif</dd>
-        </div>
-        <div class="card p-4 sm:p-5">
-            <dt class="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">Total CAR <x-icon name="warning-octagon" class="size-5 text-red-700" /></dt>
-            <dd class="mt-1 text-3xl font-extrabold text-red-700 tabular-nums">{{ $findingsCount }}</dd>
-            <dd class="text-xs text-slate-600">Major, Minor, dan Observasi</dd>
-        </div>
-        <div class="card p-4 sm:p-5">
-            <dt class="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">Rata-rata kepatuhan <x-icon name="chart-pie-slice" class="size-5 text-brand-700" /></dt>
-            <dd class="mt-1 text-3xl font-extrabold text-brand-900 tabular-nums">{{ $averageCompliance === null ? '-' : $averageCompliance.'%' }}</dd>
-            <dd class="text-xs text-slate-600">Audit terbaru setiap PT</dd>
-        </div>
-    </dl>
+    <x-stat-strip class="mt-6 lg:grid-cols-4" :stats="[
+        ['label' => 'Jumlah PT', 'value' => $companiesCount, 'hint' => $auditsCount.' audit tercatat'],
+        ['label' => 'Akun auditor', 'value' => $auditorsCount, 'hint' => $activeAuditorsCount.' akun aktif'],
+        ['label' => 'Total CAR', 'value' => $findingsCount, 'tone' => 'text-red-700', 'hint' => 'Major, Minor, dan Observasi'],
+        ['label' => 'Rata-rata kepatuhan', 'value' => $averageCompliance === null ? '-' : $averageCompliance.'%', 'hint' => 'Audit terbaru setiap PT'],
+    ]" />
 
     <div class="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
         {{-- Best company --}}
-        <section class="relative isolate overflow-hidden rounded-xl bg-brand-900 p-6 text-white xl:col-span-5" aria-labelledby="best-title">
-            <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_100%_0%,rgb(89_134_195/0.45),transparent_55%)]"></div>
-            <p id="best-title" class="flex items-center gap-2 text-sm font-semibold text-brand-200">
-                <x-icon name="trophy" class="size-5 text-amber-300" />
-                PT hasil audit terbaik
-            </p>
+        <section class="rounded-xl bg-brand-900 p-6 text-white xl:col-span-5" aria-labelledby="best-title">
+            <p id="best-title" class="text-sm font-semibold text-brand-200">PT hasil audit terbaik</p>
             @if ($best)
                 <p class="mt-4 text-2xl leading-tight font-extrabold">{{ $best->company->name }}</p>
                 <p class="mt-1 text-sm text-brand-200">{{ $best->audit_number ?: 'Tanpa no. audit' }}, {{ $best->audit_date?->translatedFormat('d F Y') ?? 'tanpa tanggal' }}</p>
@@ -43,7 +23,7 @@
                         <p class="text-5xl font-extrabold tabular-nums">{{ $best->compliance() }}<span class="text-2xl text-brand-200">%</span></p>
                         <p class="text-sm text-brand-200">Kepatuhan</p>
                     </div>
-                    <dl class="grid grid-cols-2 gap-x-6 gap-y-1 pb-1 text-sm">
+                    <dl class="grid grid-cols-2 gap-x-6 gap-y-1 pb-1 text-sm whitespace-nowrap">
                         <dt class="text-brand-200">Item diperiksa</dt><dd class="font-bold tabular-nums">{{ $best->items_total }}</dd>
                         <dt class="text-brand-200">Sesuai</dt><dd class="font-bold tabular-nums">{{ $best->items_sesuai }}</dd>
                         <dt class="text-brand-200">CAR</dt><dd class="font-bold tabular-nums">{{ $best->items_findings }}</dd>
@@ -69,18 +49,19 @@
             @else
                 <ol class="divide-y divide-slate-100">
                     @foreach ($ranking as $audit)
-                        <li wire:key="rank-{{ $audit->id }}" class="flex items-center gap-4 px-5 py-3">
+                        {{-- Phones: the meter drops under the name so the name keeps its width. --}}
+                        <li wire:key="rank-{{ $audit->id }}" class="grid grid-cols-[1.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1.5 px-5 py-3 sm:grid-cols-[1.5rem_minmax(0,1fr)_auto_auto]">
                             <span @class([
-                                'grid size-8 shrink-0 place-items-center rounded-full text-sm font-extrabold',
-                                'bg-amber-100 text-amber-800' => $loop->first,
-                                'bg-slate-100 text-slate-700' => ! $loop->first,
+                                'row-span-2 text-right text-xl font-extrabold tabular-nums sm:row-span-1',
+                                'text-brand-900' => $loop->first,
+                                'text-slate-500' => ! $loop->first,
                             ])>{{ $loop->iteration }}</span>
-                            <div class="min-w-0 flex-1">
+                            <div class="min-w-0">
                                 <p class="font-bold break-words text-brand-900">{{ $audit->company->name }}</p>
                                 <p class="text-xs text-slate-600">{{ $audit->audit_number ?: 'Tanpa no. audit' }}, {{ $audit->items_findings }} CAR, {{ $audit->user?->name ?? 'akun dihapus' }}</p>
                             </div>
-                            <x-compliance-badge :value="$audit->compliance()" />
-                            <a href="{{ route('audits.recap', $audit) }}" wire:navigate class="btn btn-sm btn-icon btn-ghost" aria-label="Buka rekap {{ $audit->company->name }}">
+                            <x-compliance :value="$audit->compliance()" class="col-start-2 row-start-2 -ml-2 justify-self-start sm:col-start-3 sm:row-start-1 sm:ml-0" />
+                            <a href="{{ route('audits.recap', $audit) }}" wire:navigate class="btn btn-sm btn-icon btn-ghost col-start-3 row-span-2 row-start-1 sm:col-start-4 sm:row-span-1" aria-label="Buka rekap {{ $audit->company->name }}">
                                 <x-icon name="caret-right" class="size-4" />
                             </a>
                         </li>
@@ -109,7 +90,7 @@
                                 <td>{{ $audit->audit_number ?: '-' }}</td>
                                 <td>{{ $audit->user?->name ?? 'Akun dihapus' }}</td>
                                 <td class="text-center font-bold tabular-nums {{ $audit->items_findings > 0 ? 'text-red-700' : 'text-slate-500' }}">{{ $audit->items_findings }}</td>
-                                <td class="text-center"><x-compliance-badge :value="$audit->compliance()" :empty="$audit->items_total === 0" /></td>
+                                <td class="text-center"><x-compliance :value="$audit->compliance()" :empty="$audit->items_total === 0" /></td>
                                 <td class="text-right"><a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-soft">Buka</a></td>
                             </tr>
                         @endforeach

@@ -18,14 +18,26 @@ enum FindingSeverity: string
     }
 
     /**
-     * Tailwind classes for the severity badge (light surface).
+     * Ordinal weight drawn as filled bars in the severity marker (3 = most severe).
      */
-    public function badgeClasses(): string
+    public function level(): int
     {
         return match ($this) {
-            self::Major => 'bg-red-50 text-red-800 ring-red-200',
-            self::Minor => 'bg-orange-50 text-orange-800 ring-orange-200',
-            self::Observasi => 'bg-amber-50 text-amber-800 ring-amber-200',
+            self::Major => 3,
+            self::Minor => 2,
+            self::Observasi => 1,
+        };
+    }
+
+    /**
+     * Text color for the severity marker. All pass WCAG AA on white.
+     */
+    public function toneClass(): string
+    {
+        return match ($this) {
+            self::Major => 'text-red-700',
+            self::Minor => 'text-orange-700',
+            self::Observasi => 'text-amber-700',
         };
     }
 

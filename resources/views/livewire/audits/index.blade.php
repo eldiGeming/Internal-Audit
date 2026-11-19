@@ -23,20 +23,21 @@
         </div>
 
         @if ($audits->isEmpty())
-            <div class="flex flex-col items-center px-6 py-16 text-center">
-                <span class="grid size-14 place-items-center rounded-full bg-brand-50 text-brand-700"><x-icon name="folder-open" class="size-7" /></span>
-                @if ($search !== '')
-                    <p class="mt-4 text-base font-semibold text-slate-800">Tidak ada audit yang cocok dengan "{{ $search }}"</p>
-                    <p class="mt-1 text-sm text-slate-600">Periksa ejaan nama PT atau no. audit.</p>
-                @else
-                    <p class="mt-4 text-base font-semibold text-slate-800">Belum ada audit</p>
-                    <p class="mt-1 max-w-sm text-sm text-slate-600">Mulai audit baru, lalu isi identitas, checklist, dan hasil pemeriksaan setiap departemen.</p>
-                    <button type="button" wire:click="openCreateModal" class="btn btn-primary mt-5">
-                        <x-icon name="plus" class="size-4" />
-                        Audit baru
-                    </button>
-                @endif
-            </div>
+            @if ($search !== '')
+                <x-empty-state icon="magnifying-glass" :title="'Tidak ada audit yang cocok dengan “'.$search.'”'">
+                    Periksa ejaan nama PT atau no. audit.
+                </x-empty-state>
+            @else
+                <x-empty-state icon="folder-open" title="Belum ada audit">
+                    Mulai audit baru, lalu isi identitas, checklist, dan hasil pemeriksaan setiap departemen.
+                    <x-slot:actions>
+                        <button type="button" wire:click="openCreateModal" class="btn btn-primary">
+                            <x-icon name="plus" class="size-4" />
+                            Audit baru
+                        </button>
+                    </x-slot:actions>
+                </x-empty-state>
+            @endif
         @else
             {{-- Desktop table --}}
             <div class="relative hidden overflow-x-auto md:block">
@@ -69,7 +70,7 @@
                                 <td class="text-center tabular-nums">
                                     <span @class(['font-bold', 'text-red-700' => $audit->items_findings > 0, 'text-slate-500' => $audit->items_findings === 0])>{{ $audit->items_findings }}</span>
                                 </td>
-                                <td class="text-center"><x-compliance-badge :value="$audit->compliance()" :empty="$audit->items_total === 0" /></td>
+                                <td class="text-center"><x-compliance :value="$audit->compliance()" :empty="$audit->items_total === 0" /></td>
                                 <td>
                                     <div class="flex justify-end gap-1">
                                         <a href="{{ route('audits.identity', $audit) }}" wire:navigate class="btn btn-sm btn-soft group">
@@ -99,7 +100,7 @@
                                 <p class="mt-0.5 text-sm text-slate-600">{{ $audit->audit_number ?: 'Tanpa no. audit' }}, {{ $audit->audit_date?->translatedFormat('d M Y') ?? 'tanpa tanggal' }}</p>
                                 @if ($isAdmin) <p class="text-sm text-slate-600">{{ $audit->user?->name ?? 'Akun dihapus' }}</p> @endif
                             </div>
-                            <x-compliance-badge :value="$audit->compliance()" :empty="$audit->items_total === 0" />
+                            <x-compliance :value="$audit->compliance()" :empty="$audit->items_total === 0" />
                         </div>
                         <dl class="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
                             <div class="rounded-lg bg-slate-50 py-2"><dt class="text-slate-600">Dept</dt><dd class="font-bold tabular-nums">{{ $audit->departments_count }}</dd></div>

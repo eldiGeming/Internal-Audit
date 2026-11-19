@@ -6,15 +6,15 @@
     </x-audit.header>
 
     @if ($department === null)
-        <div class="card flex flex-col items-center px-6 py-14 text-center">
-            <span class="grid size-14 place-items-center rounded-full bg-brand-50 text-brand-700"><x-icon name="buildings" class="size-7" /></span>
-            <p class="mt-4 text-base font-semibold text-slate-800">Belum ada departemen untuk diberi checklist</p>
-            <p class="mt-1 max-w-md text-sm text-slate-600">Tambahkan departemen di sini atau di halaman Identitas Audit, lalu susun pertanyaan pemeriksaannya.</p>
-            <button type="button" wire:click="openDepartmentModal" class="btn btn-primary mt-5">
-                <x-icon name="plus" class="size-4" />
-                Departemen baru
-            </button>
-        </div>
+        <x-empty-state icon="buildings" title="Belum ada departemen untuk diberi checklist" class="card">
+            Tambahkan departemen di sini atau di halaman Identitas Audit, lalu susun pertanyaan pemeriksaannya.
+            <x-slot:actions>
+                <button type="button" wire:click="openDepartmentModal" class="btn btn-primary">
+                    <x-icon name="plus" class="size-4" />
+                    Departemen baru
+                </button>
+            </x-slot:actions>
+        </x-empty-state>
     @else
         <div class="mb-5">
             @include('livewire.audits.partials.department-picker')
@@ -88,9 +88,7 @@
                         Membaca file...
                     </span>
                     <span wire:loading.remove wire:target="importFile" class="flex flex-col items-center">
-                        <span class="grid size-10 place-items-center rounded-full bg-white text-brand-700 ring-1 ring-brand-200 transition-transform duration-300 group-hover:-translate-y-0.5">
-                            <x-icon name="upload-simple" class="size-5" />
-                        </span>
+                        <x-icon name="upload-simple" class="size-7 text-brand-700 transition-transform duration-300 group-hover:-translate-y-0.5" />
                         <span class="mt-2 text-sm font-semibold text-brand-900">Import file checklist</span>
                         <span id="import-help" class="mt-0.5 text-xs text-slate-600">Klik atau seret file .xlsx, .csv, atau .json (maks. 2 MB)</span>
                     </span>
@@ -112,9 +110,9 @@
         <section class="card mt-5 p-4 sm:p-6" aria-labelledby="chk-items">
             <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <h2 id="chk-items" class="flex flex-wrap items-center gap-2 text-base font-bold text-brand-900">
+                    <h2 id="chk-items" class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-base font-bold text-brand-900">
                         Daftar item pemeriksaan
-                        <span class="badge bg-slate-100 text-slate-700 ring-slate-200">{{ $filledCount }} pertanyaan terisi</span>
+                        <span class="text-sm font-medium text-slate-500 tabular-nums">{{ $filledCount }} pertanyaan terisi</span>
                     </h2>
                     <p class="mt-1 text-sm text-slate-600">Tulis pertanyaannya dulu. Catatan dan hasil pemeriksaan diisi saat audit berlangsung.</p>
                 </div>

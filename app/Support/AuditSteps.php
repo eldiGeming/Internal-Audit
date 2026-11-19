@@ -9,22 +9,24 @@ namespace App\Support;
 final class AuditSteps
 {
     /**
-     * @return list<array{key: string, route: string, number: int, label: string, icon: string, badge: ?string}>
+     * `count` names a key of AuditStep::stepCounts(); `unit` is the word read after that number.
+     *
+     * @return list<array{key: string, route: string, number: int, label: string, icon: string, count: ?string, unit: ?string}>
      */
     public static function all(): array
     {
         return [
-            ['key' => 'identity', 'route' => 'audits.identity', 'number' => 1, 'label' => 'Identitas Audit', 'icon' => 'identification-card', 'badge' => null],
-            ['key' => 'checklist', 'route' => 'audits.checklist', 'number' => 2, 'label' => 'Checklist Audit', 'icon' => 'list-checks', 'badge' => 'items'],
-            ['key' => 'inspection', 'route' => 'audits.inspection', 'number' => 3, 'label' => 'Daftar Periksa', 'icon' => 'file-text', 'badge' => 'departments'],
-            ['key' => 'car', 'route' => 'audits.car', 'number' => 4, 'label' => 'CAR', 'icon' => 'warning-octagon', 'badge' => 'findings'],
-            ['key' => 'recap', 'route' => 'audits.recap', 'number' => 5, 'label' => 'Rekap Audit', 'icon' => 'chart-bar', 'badge' => null],
-            ['key' => 'conclusion', 'route' => 'audits.conclusion', 'number' => 6, 'label' => 'Kesimpulan Audit', 'icon' => 'seal-check', 'badge' => null],
+            ['key' => 'identity', 'route' => 'audits.identity', 'number' => 1, 'label' => 'Identitas Audit', 'icon' => 'identification-card', 'count' => null, 'unit' => null],
+            ['key' => 'checklist', 'route' => 'audits.checklist', 'number' => 2, 'label' => 'Checklist Audit', 'icon' => 'list-checks', 'count' => 'items', 'unit' => 'pertanyaan'],
+            ['key' => 'inspection', 'route' => 'audits.inspection', 'number' => 3, 'label' => 'Daftar Periksa', 'icon' => 'file-text', 'count' => 'departments', 'unit' => 'departemen'],
+            ['key' => 'car', 'route' => 'audits.car', 'number' => 4, 'label' => 'CAR', 'icon' => 'warning-octagon', 'count' => 'findings', 'unit' => 'temuan'],
+            ['key' => 'recap', 'route' => 'audits.recap', 'number' => 5, 'label' => 'Rekap Audit', 'icon' => 'chart-bar', 'count' => null, 'unit' => null],
+            ['key' => 'conclusion', 'route' => 'audits.conclusion', 'number' => 6, 'label' => 'Kesimpulan Audit', 'icon' => 'seal-check', 'count' => null, 'unit' => null],
         ];
     }
 
     /**
-     * @return array{key: string, route: string, number: int, label: string, icon: string, badge: ?string}|null
+     * @return array{key: string, route: string, number: int, label: string, icon: string, count: ?string, unit: ?string}|null
      */
     public static function neighbour(string $key, int $offset): ?array
     {

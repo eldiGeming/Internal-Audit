@@ -47,7 +47,7 @@
 
 <div class="shrink-0 border-t border-white/10 p-4">
     <div class="flex items-center gap-3">
-        <span class="grid size-10 place-items-center rounded-full bg-white/10 text-sm font-bold ring-1 ring-white/20">{{ $user->initials() }}</span>
+        <span class="grid size-10 place-items-center rounded-lg bg-white/10 text-sm font-bold ring-1 ring-white/20">{{ $user->initials() }}</span>
         <div class="min-w-0 flex-1">
             <p class="text-sm font-semibold break-words">{{ $user->name }}</p>
             <p class="text-xs break-words text-brand-200">{{ $user->role->label() }} · {{ $user->username }}</p>

@@ -8,7 +8,8 @@
 /*
  * Design tokens.
  * Brand navy comes from the client reference (#0f294a). Neutrals are Tailwind slate (cool, matches navy).
- * Shape rule: controls (buttons, inputs) 8px radius, surfaces (cards, sheets, modals) 12px, badges full pill.
+ * Shape rule: controls (buttons, inputs, switch) 8px radius or less, surfaces (cards, sheets, modals) 12px.
+ * No pills: statuses and counts are text (with an icon, severity bars, or a compliance meter), never tinted capsules.
  * Semantic result colors: emerald = Sesuai, red = Major, orange = Minor, amber = Observasi. No other accents.
  */
 @theme {
@@ -124,11 +125,6 @@
 
     textarea.field {
         @apply min-h-[4.5rem] resize-y leading-relaxed;
-    }
-
-    /* Badges */
-    .badge {
-        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ring-1 ring-inset;
     }
 
     /* Data tables */

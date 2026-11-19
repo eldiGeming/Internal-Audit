@@ -23,7 +23,7 @@
         <div class="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
             <div class="flex items-center gap-2.5">
                 @if ($icon)
-                    <span class="grid size-9 place-items-center rounded-lg bg-brand-50 text-brand-700"><x-icon :name="$icon" class="size-5" /></span>
+                    <x-icon :name="$icon" class="size-6 shrink-0 text-brand-700" />
                 @endif
                 <h3 class="text-base font-bold text-brand-900">{{ $title }}</h3>
             </div>

@@ -76,9 +76,7 @@
                         <img src="{{ $audit->company->logoUrl() }}" alt="Logo {{ $audit->company->name }}" class="max-h-32 max-w-full object-contain" draggable="false">
                         <span class="mt-3 text-xs font-medium text-slate-600 group-hover:text-brand-700">Klik atau seret gambar untuk mengganti</span>
                     @else
-                        <span class="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-700 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">
-                            <x-icon name="cloud-arrow-up" class="size-6" />
-                        </span>
+                        <x-icon name="cloud-arrow-up" class="size-8 text-brand-700 transition-transform duration-300 group-hover:-translate-y-0.5" />
                         <span class="mt-3 text-sm font-semibold text-slate-800">Unggah logo perusahaan</span>
                         <span class="mt-1 text-xs text-slate-600">Klik untuk memilih atau seret file ke sini</span>
                     @endif
@@ -106,11 +104,9 @@
         </div>
 
         @if ($departmentRows->isEmpty())
-            <div class="flex flex-col items-center px-6 py-12 text-center">
-                <span class="grid size-12 place-items-center rounded-full bg-slate-100 text-slate-500"><x-icon name="buildings" class="size-6" /></span>
-                <p class="mt-3 text-sm font-semibold text-slate-800">Belum ada departemen</p>
-                <p class="mt-1 max-w-sm text-sm text-slate-600">Tambahkan departemen yang akan diaudit beserta auditee dan auditornya.</p>
-            </div>
+            <x-empty-state icon="buildings" title="Belum ada departemen">
+                Tambahkan departemen yang akan diaudit beserta auditee dan auditornya.
+            </x-empty-state>
         @else
             <div class="hidden grid-cols-[3rem_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_3.5rem] gap-3 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-bold tracking-wide text-brand-900 uppercase sm:grid sm:px-6">
                 <span class="text-center">No</span><span>Departemen</span><span>Auditee</span><span>Auditor</span><span class="sr-only">Aksi</span>

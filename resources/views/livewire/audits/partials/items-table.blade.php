@@ -19,15 +19,15 @@
     </div>
 
     @if ($department->items->isEmpty())
-        <div class="flex flex-col items-center border-t border-slate-100 bg-white px-6 py-10 text-center">
-            <span class="grid size-12 place-items-center rounded-full bg-slate-100 text-slate-500"><x-icon name="list-checks" class="size-6" /></span>
-            <p class="mt-3 text-sm font-semibold text-slate-800">Belum ada item pemeriksaan</p>
-            <p class="mt-1 max-w-sm text-sm text-slate-600">Tambahkan item lalu tulis pertanyaannya, atau impor dari file template.</p>
-            <button type="button" wire:click="addItems(1)" class="btn btn-primary mt-4">
-                <x-icon name="plus" class="size-4" />
-                Tambah item
-            </button>
-        </div>
+        <x-empty-state icon="list-checks" title="Belum ada item pemeriksaan" class="border-t border-slate-100 bg-white">
+            Tambahkan item lalu tulis pertanyaannya, atau impor dari file template.
+            <x-slot:actions>
+                <button type="button" wire:click="addItems(1)" class="btn btn-primary">
+                    <x-icon name="plus" class="size-4" />
+                    Tambah item
+                </button>
+            </x-slot:actions>
+        </x-empty-state>
     @endif
 
     <ol class="divide-y divide-slate-100 bg-white">

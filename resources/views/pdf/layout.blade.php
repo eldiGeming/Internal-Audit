@@ -33,11 +33,12 @@
         .minor { color: #c2410c; }
         .obs { color: #b45309; }
         .muted { color: #64748b; }
-        .pill { display: inline-block; padding: 1px 6px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 7pt; font-weight: bold; }
-        .pill.major { background: #fef2f2; border-color: #fecaca; }
-        .pill.minor { background: #fff7ed; border-color: #fed7aa; }
-        .pill.obs { background: #fffbeb; border-color: #fde68a; }
-        .pill.ok { background: #ecfdf5; border-color: #a7f3d0; }
+        /* Square marker with a severity bar on the left, same language as the screen (no rounded pills). */
+        .pill { display: inline-block; padding: 1px 5px; border: 1px solid #cbd5e1; border-left: 3px solid #64748b; border-radius: 1px; font-size: 7pt; font-weight: bold; }
+        .pill.major { border-left-color: #b91c1c; }
+        .pill.minor { border-left-color: #c2410c; }
+        .pill.obs { border-left-color: #b45309; }
+        .pill.ok { border-left-color: #047857; }
         .section { border: 1px solid #94a3b8; margin-bottom: 7px; page-break-inside: avoid; }
         .section-title { background: #eef2f7; border-bottom: 1px solid #94a3b8; padding: 4px 7px; font-size: 7.4pt; font-weight: bold; color: #0f294a; text-transform: uppercase; }
         .section-title.blue { background: #e7eef8; }

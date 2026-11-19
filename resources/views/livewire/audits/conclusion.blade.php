@@ -12,7 +12,7 @@
     </x-audit.header>
 
     <article class="sheet space-y-8 p-5 sm:p-8">
-        <x-audit.doc-header :company="$audit->company" kicker="Laporan eksekutif hasil audit internal" title="Kesimpulan Audit Internal">
+        <x-audit.doc-header :company="$audit->company" title="Kesimpulan Audit Internal">
             <p>Client: <strong class="text-slate-900">{{ $audit->company->name }}</strong>, no. audit: <strong class="text-slate-900">{{ $audit->audit_number ?: '-' }}</strong>, tanggal: <strong class="text-slate-900">{{ $audit->audit_date?->translatedFormat('d F Y') ?? '-' }}</strong></p>
             <p>Tujuan audit: {{ $audit->objective ?: '-' }}</p>
             <p>Criteria acuan: <strong class="text-brand-900">{{ $criteria }}</strong></p>
@@ -21,11 +21,14 @@
         {{-- I. Recap --}}
         <section aria-labelledby="sec-1">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h3 id="sec-1" class="flex items-center gap-2 text-base font-extrabold text-brand-900">
-                    <span class="grid size-7 place-items-center rounded-md bg-brand-900 text-xs text-white">I</span>
+                <h3 id="sec-1" class="flex items-baseline gap-2.5 text-base font-extrabold text-brand-900">
+                    <span class="w-6 shrink-0 text-slate-500">I.</span>
                     Rekapitulasi hasil audit seluruh departemen
                 </h3>
-                <span class="badge bg-brand-50 text-brand-900 ring-brand-200">Kepatuhan keseluruhan: {{ $totals['compliance'] }}%</span>
+                <p class="flex items-center gap-2 pl-8 text-sm font-semibold text-slate-600 sm:pl-0">
+                    Kepatuhan keseluruhan
+                    <x-compliance :value="$totals['compliance']" :empty="$totals['total'] === 0" />
+                </p>
             </div>
             <div class="relative mt-3 overflow-x-auto rounded-xl ring-1 ring-slate-300">
                 <table class="doc-table min-w-[820px]">
@@ -82,11 +85,11 @@
         {{-- II. CAR --}}
         <section aria-labelledby="sec-2">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h3 id="sec-2" class="flex items-center gap-2 text-base font-extrabold text-brand-900">
-                    <span class="grid size-7 place-items-center rounded-md bg-red-700 text-xs text-white">II</span>
+                <h3 id="sec-2" class="flex items-baseline gap-2.5 text-base font-extrabold text-brand-900">
+                    <span class="w-6 shrink-0 text-slate-500">II.</span>
                     Daftar CAR &amp; rencana tindakan
                 </h3>
-                <span class="badge bg-red-50 text-red-800 ring-red-200">{{ $findings->count() }} CAR tercatat</span>
+                <p @class(['pl-8 text-sm font-semibold tabular-nums sm:pl-0', 'text-red-700' => $findings->isNotEmpty(), 'text-slate-500' => $findings->isEmpty()])>{{ $findings->count() }} CAR tercatat</p>
             </div>
             <div class="mt-3 space-y-4">
                 @forelse ($findings as $finding)
@@ -101,8 +104,8 @@
 
         {{-- III. Final statement --}}
         <section aria-labelledby="sec-3">
-            <h3 id="sec-3" class="flex items-center gap-2 text-base font-extrabold text-brand-900">
-                <span class="grid size-7 place-items-center rounded-md bg-emerald-700 text-xs text-white">III</span>
+            <h3 id="sec-3" class="flex items-baseline gap-2.5 text-base font-extrabold text-brand-900">
+                <span class="w-6 shrink-0 text-slate-500">III.</span>
                 <label for="finalConclusion">Pernyataan kesimpulan akhir &amp; rekomendasi tim auditor</label>
             </h3>
             <textarea id="finalConclusion" rows="5" wire:model.live.blur="finalConclusion" class="field mt-3"

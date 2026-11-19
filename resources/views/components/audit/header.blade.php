@@ -35,34 +35,40 @@
         {{ $actions ?? '' }}
     </div>
 
-    <nav class="card relative mt-5 overflow-x-auto p-1.5 [scrollbar-width:thin]" aria-label="Tahapan audit">
-        <ol class="flex min-w-max gap-1">
+    {{-- Step rail: one ruled strip, the current step marked by a bar along its bottom edge. Counts are plain figures. --}}
+    <nav class="card relative mt-5 overflow-x-auto [scrollbar-width:thin]" aria-label="Tahapan audit"
+         x-data x-init="const step = $el.querySelector('[aria-current=step]'); if (step && $el.scrollWidth > $el.clientWidth) { $el.scrollLeft = step.offsetLeft - ($el.clientWidth - step.offsetWidth) / 2 }">
+        <ol class="flex min-w-max divide-x divide-slate-200">
             @foreach ($steps as $step)
                 @php
                     $isCurrent = $step['key'] === $current;
-                    $badge = $step['badge'] ? ($counts[$step['badge']] ?? 0) : null;
+                    $count = $step['count'] ? ($counts[$step['count']] ?? 0) : null;
+                    $hasFindings = $step['count'] === 'findings' && $count > 0;
                 @endphp
                 <li class="flex-1">
                     <a href="{{ route($step['route'], $audit) }}" wire:navigate
                        @if ($isCurrent) aria-current="step" @endif
+                       @if ($count !== null) title="{{ $count }} {{ $step['unit'] }}" @endif
                        @class([
-                           'group flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold whitespace-nowrap transition',
-                           'bg-brand-900 text-white shadow-sm' => $isCurrent,
-                           'text-slate-600 hover:bg-slate-100 hover:text-brand-900' => ! $isCurrent,
+                           'group relative flex min-h-12 items-center justify-center gap-2 px-4 text-sm whitespace-nowrap transition-colors',
+                           'bg-brand-50/70 font-bold text-brand-900' => $isCurrent,
+                           'font-semibold text-slate-600 hover:bg-slate-50 hover:text-brand-900' => ! $isCurrent,
                        ])>
                         <span @class([
-                            'grid size-6 place-items-center rounded-full text-xs font-bold transition-transform duration-200 group-hover:scale-110',
-                            'bg-white text-brand-900' => $isCurrent,
-                            'bg-slate-100 text-slate-700 ring-1 ring-slate-200' => ! $isCurrent,
+                            'text-xs font-bold tabular-nums',
+                            'text-brand-700' => $isCurrent,
+                            'text-slate-500 group-hover:text-brand-700' => ! $isCurrent,
                         ])>{{ $step['number'] }}</span>
                         <span>{{ $step['label'] }}</span>
-                        @if ($badge !== null)
+                        @if ($count !== null)
                             <span @class([
-                                'min-w-5 rounded-full px-1.5 text-center text-[11px] leading-5 font-bold',
-                                'bg-red-600 text-white' => $step['badge'] === 'findings' && $badge > 0,
-                                'bg-white/20 text-white' => $isCurrent && ! ($step['badge'] === 'findings' && $badge > 0),
-                                'bg-slate-200 text-slate-700' => ! $isCurrent && ! ($step['badge'] === 'findings' && $badge > 0),
-                            ])>{{ $badge }}</span>
+                                'text-xs font-bold tabular-nums',
+                                'text-red-700' => $hasFindings,
+                                'text-slate-500' => ! $hasFindings,
+                            ])>{{ $count }}<span class="sr-only"> {{ $step['unit'] }}</span></span>
+                        @endif
+                        @if ($isCurrent)
+                            <span class="absolute inset-x-0 bottom-0 h-[3px] bg-brand-900" aria-hidden="true"></span>
                         @endif
                     </a>
                 </li>

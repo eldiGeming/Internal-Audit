@@ -24,7 +24,7 @@
                         <x-icon name="buildings" class="size-5 text-brand-600" />
                         {{ $company->name }}
                     </h2>
-                    <span class="badge bg-red-50 text-red-800 ring-red-200">{{ $companyAudits->sum(fn ($entry) => $entry['findings']->count()) }} dokumen CAR</span>
+                    <p class="text-sm font-semibold text-red-700 tabular-nums">{{ $companyAudits->sum(fn ($entry) => $entry['findings']->count()) }} dokumen CAR</p>
                 </div>
 
                 @foreach ($companyAudits as $entry)
@@ -39,10 +39,10 @@
                             @foreach ($entry['findings'] as $finding)
                                 <li wire:key="finding-{{ $finding['item']->id }}" class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                                     <div class="min-w-0">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <span class="rounded-md bg-red-700 px-2 py-0.5 text-xs font-bold text-white">{{ $finding['number'] }}</span>
-                                            <span class="text-sm font-bold text-brand-900">{{ $finding['department']->displayName() }}</span>
-                                            <x-severity-badge :severity="$finding['severity']" />
+                                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                                            <span class="text-sm font-extrabold tracking-wide text-brand-900 tabular-nums">{{ $finding['number'] }}</span>
+                                            <span class="text-sm font-semibold text-slate-700">{{ $finding['department']->displayName() }}</span>
+                                            <x-severity :severity="$finding['severity']" />
                                         </div>
                                         <p class="mt-1 line-clamp-2 text-sm text-slate-700">{{ $finding['item']->question }}</p>
                                     </div>
@@ -59,11 +59,9 @@
                 @endforeach
             </section>
         @empty
-            <div class="card flex flex-col items-center px-6 py-14 text-center">
-                <span class="grid size-14 place-items-center rounded-full bg-emerald-50 text-emerald-700"><x-icon name="check-circle" class="size-7" /></span>
-                <p class="mt-4 text-base font-semibold text-slate-800">Tidak ada dokumen CAR</p>
-                <p class="mt-1 text-sm text-slate-600">Belum ada temuan Tidak Sesuai{{ $companyId ? ' pada PT ini' : '' }}.</p>
-            </div>
+            <x-empty-state icon="check-circle" title="Tidak ada dokumen CAR" class="card">
+                Belum ada temuan Tidak Sesuai{{ $companyId ? ' pada PT ini' : '' }}.
+            </x-empty-state>
         @endforelse
     </div>
 

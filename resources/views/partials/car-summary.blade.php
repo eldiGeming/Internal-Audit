@@ -9,11 +9,11 @@
 @endphp
 
 <div class="overflow-hidden rounded-xl ring-1 ring-slate-300">
-    <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2.5">
-        <span class="rounded-md bg-red-700 px-2 py-0.5 text-xs font-bold text-white">{{ $finding['number'] }}</span>
-        <span class="text-sm font-bold text-brand-900">{{ $finding['department']->displayName() }}</span>
-        <x-severity-badge :severity="$finding['severity']" />
-        <span @class(['badge ml-auto', 'bg-emerald-50 text-emerald-800 ring-emerald-200' => $status === \App\Enums\CarStatus::Closed, 'bg-amber-50 text-amber-800 ring-amber-200' => $status === \App\Enums\CarStatus::Open])>{{ $status->label() }}</span>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-slate-200 bg-slate-50 px-4 py-2.5">
+        <span class="text-sm font-extrabold tracking-wide text-brand-900 tabular-nums">{{ $finding['number'] }}</span>
+        <span class="text-sm font-semibold text-slate-700">{{ $finding['department']->displayName() }}</span>
+        <x-severity :severity="$finding['severity']" />
+        <x-car-status :status="$status" class="sm:ml-auto" />
     </div>
     <dl class="grid gap-x-6 gap-y-3 p-4 text-sm sm:grid-cols-2">
         <div class="sm:col-span-2">

@@ -1,9 +1,5 @@
 <div x-data="{ showPassword: false, forgotOpen: false }" class="card p-6 shadow-xl shadow-brand-950/5 sm:p-9">
-    <span class="badge bg-brand-50 text-brand-800 ring-brand-100">
-        <x-icon name="lock-simple" class="size-3.5" />
-        Autentikasi pengguna
-    </span>
-    <h2 class="mt-3 text-2xl font-extrabold tracking-tight text-brand-900">Masuk ke sistem</h2>
+    <h2 class="text-2xl font-extrabold tracking-tight text-brand-900">Masuk ke sistem</h2>
     <p class="mt-1 text-sm text-slate-600">Gunakan akun yang diberikan administrator untuk membuka dashboard audit.</p>
 
     @if (session('status'))
